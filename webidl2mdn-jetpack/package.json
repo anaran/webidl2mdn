@@ -1,0 +1,19 @@
+{
+  "title": "WebIDL to MDN Sceleton Converter",
+  "name": "webidl2mdn-jetpack",
+  "version": "0.0.1",
+  "description": "WebIDL to MDN Sceleton Converter",
+  "main": "index.js",
+  "author": "anaran",
+  "engines": {
+    "firefox": ">=38.0a1",
+    "fennec": ">=38.0a1"
+  },
+  "license": "MIT",
+  "keywords": [
+    "jetpack"
+  ],
+  "dependencies": {
+    "webidl2": "^2.0.11"
+  }
+}

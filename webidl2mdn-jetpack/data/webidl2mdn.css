@@ -1,0 +1,44 @@
+pre {
+  width: 90%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis ellipsis;
+}
+
+textarea.overview_source {
+  resize: both;
+}
+
+label:not(.radio) {
+  margin: 1em;
+  font-weight: 700;
+}
+
+label.radio {
+  margin: 0;
+}
+
+input, select {
+  margin-inline-start: 1em;
+}
+
+.radio_item:not(:checked) {
+    visibility: hidden;
+}
+
+/* .radio_item:checked {
+    display: inline;
+} */
+
+p {
+  font-style: italic;
+}
+
+div.settings {
+  margin: 1em;
+  border-bottom: 1px solid black;
+}
+
+a.settings {
+  margin: 0.5rem;
+}
