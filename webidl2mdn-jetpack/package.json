@@ -1,8 +1,8 @@
 {
-  "title": "WebIDL to MDN Sceleton Converter",
+  "title": "WebIDL to MDN Skeleton Converter",
   "name": "webidl2mdn-jetpack",
   "version": "0.0.1",
-  "description": "WebIDL to MDN Sceleton Converter",
+  "description": "WebIDL to MDN Skeleton Converter",
   "main": "index.js",
   "author": "anaran",
   "engines": {
