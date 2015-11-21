@@ -99,7 +99,7 @@ tabs.on('load', function(tab) {
                 let tree2 = WebIDL2.parse(xhr.responseText);
                 console.log(JSON.stringify(tree2, null, 2));
                 webidl2mdnWorker.port.emit('load_webidl2mdn', {
-                  // prefs: sp.prefs,
+                  source: originallyActiveTab.url,
                   AST: tree2
                 });
               }

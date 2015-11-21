@@ -23,6 +23,8 @@
   (typeof self !== 'undefined') && self.port.on('load_webidl2mdn', function(data) {
     try {
       console.log('load_webidl2mdn', data);
+      let path = data.source.split('/');
+      let nameOfApi = data.source.match(/([^\/]+)\.webidl\b/)[1];
       let applicationDescription = document.getElementById('application_description');
       let applicationDescriptionToggle = document.getElementById('application_description_toggle');
       // NOTE: Keep this first, before adding nodes to document.
@@ -49,7 +51,14 @@
       let overview = document.querySelector('template.overview').content;
       let overviewUI = document.importNode(overview, "deep").firstElementChild;
       document.body.appendChild(overviewUI);
+      document.title = 'Generated MDN Skeletons for API ' + nameOfApi;
+      document.querySelector('h1#title').textContent = document.title;
+      document.querySelector('div#production').textContent = 'Produced from ' + data.source;
+      let overviewInterfacesHeadline = overviewUI.querySelector('h2#interfaces');
+      overviewInterfacesHeadline.textContent = nameOfApi + ' Interfaces';
       let overviewSource = document.getElementById('overview_source');
+      let overviewTags = document.getElementById('overview_tags');
+      overviewTags.value = "Overview, API";
       overviewUI.normalize();
       overviewSource.value = overviewUI.innerHTML;
       overviewSource.style['display'] = 'none';

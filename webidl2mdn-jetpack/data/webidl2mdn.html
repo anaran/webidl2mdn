@@ -10,9 +10,13 @@
     <!--                 <script src="my-utils.js"></script> -->
   </head>
   <body role="application">
-    <h1 data-l10n-id="settings_title">Webidl to MDN Docs</h1>
+    <h1 id="title" data-l10n-id="title">Webidl to MDN Docs</h1>
+    <div id="production">production note</div>
     <span id="application_description_toggle">&blacktriangleright;</span>
     <pre class="info" id="application_description" data-l10n-id="addon_description">DESCRIPTION</pre>
+    <label>Overview Tags
+      <input id="overview_tags" readonly length="80" class="tags" type="text"/>
+    </label>
     <span id="overview_toggle">&blacktriangleright;</span>
     <textarea readonly cols="80" rows="40" id="overview_source"></textarea>
     <!-- Taken from https://developer.mozilla.org/en-US/Add-ons/SDK/High-Level_APIs/simple-prefs -->
@@ -43,7 +47,7 @@
           <p>The Web Audio API provides a powerful and versatile system for controlling audio on the Web, allowing developers to choose audio sources, add effects to audio, create audio visualizations, apply spatial effects (such as panning)&nbsp; and much more.</p>
         </div>
 
-        <h2 id="Web_audio_concepts_and_usage">Web audio concepts and usage</h2>
+        <h2 id="concepts_and_usage">Web audio concepts and usage</h2>
 
         <p>The Web Audio API involves handling audio operations inside an <strong>audio context</strong>, and has been designed to allow <strong>modular routing</strong>. Basic audio operations are performed with <strong>audio nodes</strong>, which are linked together to form an <strong>audio routing graph</strong>. Several sources — with different types of channel layout — are supported even within a single context. This modular design provides the flexibility to create complex audio functions with dynamic effects.</p>
 
@@ -67,7 +71,7 @@
           <p><strong>Note</strong>: You can read about the theory of the Web Audio API in a lot more detail in our article <a href="/en-US/docs/Web/API/Web_Audio_API/Basic_concepts_behind_Web_Audio_API">Basic concepts behind Web Audio API</a>.</p>
         </div>
 
-        <h2 id="Web_Audio_API_Interfaces">Web Audio API Interfaces</h2>
+        <h2 id="interfaces">Web Audio API Interfaces</h2>
 
         <p>The Web Audio API has a total of 28 interfaces and associated events, which we have split up into nine categories of functionality.</p>
 
@@ -251,28 +255,6 @@
             </li>
           </ol>
         </section>
-
-        <p>Description</p>
-        <h1><span id="interface_name">[name  of  API]</span> interfaces</h1>
-        <dl class="interfaces">
-          <dt>Name</dt>
-          <dd>Description</dd>
-        </dl>
-        <h1>Obsolete interfaces</h1>
-        <dl class="obsolete interfaces">
-          <dt>Name</dt>
-          <dd>Description</dd>
-        </dl>
-        <h1>[name  of  API] concepts and usage</h1>
-        <h1>Specifications</h1>
-        <h1>Browser compatibility</h1>
-        <h1>See also</h1>
-        <ul>
-          <li><a href="/en-US/docs/Web/API/SEE_ALSO_URL">Title</a></li>
-        </ul>
-        <h1>Tags (not a heading!)</h1>
-
-        <input class="tags" type="text"/>
       </section>
     </template>
     <template class="boolint">
