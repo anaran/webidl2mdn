@@ -2,8 +2,10 @@ var main = require("../");
 
 exports["test main"] = function(assert) {
   assert.pass("Unit test running!");
-  let w2m = require('../data/webidl2mdn.js');
-  assert.ok(typeof w2m != 'undefined', "typeof w2m != 'undefined'");
+  let w2s = require('../data/webidl2skeleton.js');
+  assert.ok(typeof w2s != 'undefined', "typeof w2s != 'undefined'");
+  let s2m = require('../data/skeleton2mdn.js');
+  assert.ok(typeof s2m != 'undefined', "typeof s2m != 'undefined'");
 };
 
 exports["test main async"] = function(assert, done) {

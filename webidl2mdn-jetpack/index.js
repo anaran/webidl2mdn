@@ -71,7 +71,7 @@ let handleErrors = function (exception) {
 tabs.on('load', function(tab) {
   console.log('tab is loaded', tab.title, tab.url);
   try {
-    let webidl2mdnTab, webidl2mdnWorker;
+    let webidl2mdnTab, webidl2mdnWorker, skeletonMdnTab, skeletonMdnTabWorker;
     // let originallyActiveTab = tabs.activeTab;
     let originallyActiveTab = tab;
     if (!/\.webidl\b/.test(tab.url)) {
@@ -85,7 +85,7 @@ tabs.on('load', function(tab) {
         webidl2mdnTab = tab;
         webidl2mdnWorker = tab.attach({
           contentScriptFile: [
-            './webidl2mdn.js',
+            './webidl2skeleton.js',
             // './report-json-parse-error.js',
             // './diagnostics_overlay.js'
           ],
@@ -100,8 +100,9 @@ tabs.on('load', function(tab) {
                 let tree2 = WebIDL2.parse(xhr.responseText);
                 console.log(JSON.stringify(tree2, null, 2));
                 webidl2mdnWorker.port.emit('load_webidl2mdn', {
+                  generator: package.title,
                   icon: package.icon,
-                  source: originallyActiveTab.url,
+                  url: originallyActiveTab.url,
                   AST: tree2
                 });
               }
@@ -111,7 +112,40 @@ tabs.on('load', function(tab) {
             }
           }});
         };
+        let emitLoadSkeleton2Mdn = function (data) {
+          tabs.open({
+            // inNewWindow: true,
+            url: data.url,
+            onReady: function (tab) {
+              skeletonMdnTab = tab;
+              skeletonMdnTabWorker = tab.attach({
+                contentScriptFile: [
+                  './skeleton2mdn.js',
+                ],
+                onError: handleErrors
+              });
+              let emitEditMdn = function () {
+                skeletonMdnTabWorker.port.emit('load_editMdn', {
+                  source: data.source,
+                  tags: data.tags
+                });
+              };
+              skeletonMdnTabWorker.port.on('request_editMdn', emitEditMdn);
+            },
+            onClose: function() {
+              skeletonMdnTab = false;
+              // NOTE: See https://bugzilla.mozilla.org/show_bug.cgi?id=1208499
+              // let me = originallyActiveTab.index;
+              for (let t of tabs) {
+                if (t === originallyActiveTab) {
+                  originallyActiveTab.activate();
+                  break;
+                }
+              }
+            }});
+        };
         webidl2mdnWorker.port.on('request_webidl2mdn', emitLoadwebidl2mdn);
+        webidl2mdnWorker.port.on('request_skeleton2mdn', emitLoadSkeleton2Mdn);
       },
       onClose: function() {
         webidl2mdnTab = false;

@@ -1,0 +1,37 @@
+;
+'use strict';
+//
+// Replace /\b(const|let)\B/ with "$1 "
+// Replace [/^( *)function (\w+)/] with [$1var $2 = function]
+// Replace [/\Bof\s*/] With [ of ]
+//
+// Author: adrian.aichner@gmail.com
+//
+// Firefox Addon Content Script.
+// require is not available in content scripts.
+// let sp = require('sdk/simple-prefs');
+// console.log('document.readyState', document.readyState);
+// (function() {
+let DEBUG_ADDON = false;
+
+// self is undefined when using require in jpm test.
+(typeof self !== 'undefined') && self.port.on('load_editMdn', function(data) {
+  try {
+    let toggleSource = document.getElementById('cke_14');
+    if (toggleSource) {
+      toggleSource.click();
+      let sourceTextarea = document.querySelector('textarea.cke_source.cke_editable');
+      let sourceTags = document.querySelector('.tagit-new>input');
+      if (sourceTextarea && sourceTags) {
+        sourceTextarea.value = data.source + sourceTextarea.value;
+        sourceTags.value = data.tags;
+      }
+    }
+  }
+  catch (e) {
+    console.log('exception', JSON.stringify(e, Object.keys(e), 2), e.toString());
+  }
+});
+// self is undefined when using require in jpm test.
+(typeof self !== 'undefined') && self.port.emit('request_editMdn');
+// })();

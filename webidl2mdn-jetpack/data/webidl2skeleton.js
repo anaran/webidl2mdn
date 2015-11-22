@@ -23,8 +23,8 @@
   (typeof self !== 'undefined') && self.port.on('load_webidl2mdn', function(data) {
     try {
       console.log('load_webidl2mdn', data);
-      let path = data.source.split('/');
-      let nameOfApi = data.source.match(/([^\/]+)\.webidl\b/)[1];
+      let path = data.url.split('/');
+      let nameOfApi = data.url.match(/([^\/]+)\.webidl\b/)[1];
       document.getElementById('favicon').href = data.icon;
       let applicationDescription = document.getElementById('application_description');
       let applicationDescriptionToggle = document.getElementById('application_description_toggle');
@@ -55,7 +55,7 @@
       // document.head.appendChild(document.createElement("base")).href = "https://developer.mozilla.org/";
       document.title = 'Generated MDN Skeletons for API ' + nameOfApi;
       document.querySelector('h1#title').textContent = document.title;
-      document.querySelector('div#production').textContent = 'Produced from ' + data.source;
+      document.querySelector('div#production').textContent = 'Produced from ' + data.url;
       let overviewInterfacesHeadline = overviewUI.querySelector('h2#interfaces');
       overviewInterfacesHeadline.textContent = nameOfApi + ' Interfaces';
       let overviewSource = document.getElementById('overview_source');
@@ -71,6 +71,14 @@
       subTreeInput.addEventListener('input', function (event) {
         mdnOverviewUrl.href = subTreeInput.value + nameOfApi + "_API$edit";
         mdnOverviewTagsUrl.href = mdnOverviewUrl + '#page-tags';
+      });
+      mdnOverviewUrl.addEventListener('click', function (event) {
+        event.preventDefault();
+        self.port.emit('request_skeleton2mdn', {
+          source: overviewSource.textContent,
+          tags: overviewTags.value,
+          url: event.target.href
+        })
       });
       let overviewTags = document.getElementById('overview_tags');
       overviewTags.value = "Overview, API, Reference, " + nameOfApi + " API";
@@ -91,6 +99,9 @@
       });
       Array.prototype.forEach.call(document.body.querySelectorAll('span.api_name'), function (element) {
         element.parentElement.replaceChild(document.createTextNode(nameOfApi), element);
+      });
+      Array.prototype.forEach.call(document.body.querySelectorAll('span.generator_name'), function (element) {
+        element.parentElement.replaceChild(document.createTextNode(data.generator + ' from ' + data.url), element);
       });
       // See https://developer.mozilla.org/en-US/docs/MDN/Contribute/Howto/Write_an_API_reference
       let interfaceDefinitionList = document.getElementById('interface_definitions');
