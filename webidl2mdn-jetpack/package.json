@@ -1,15 +1,16 @@
 {
-  "title": "WebIDL to MDN Skeleton Converter",
+  "id": "webidl2mdn-jetpack@addons.mozilla.org",
+  "title": "MDN API Referee",
   "name": "webidl2mdn-jetpack",
   "version": "0.0.1",
-  "description": "WebIDL to MDN Skeleton Converter",
+  "description": "Create MDN API Reference Skeletons from WebIDL",
   "main": "index.js",
   "author": "anaran",
   "engines": {
     "firefox": ">=38.0a1",
     "fennec": ">=38.0a1"
   },
-  "icon": "resource://webidl2mdn-jetpack/data/posts-48.png",
+  "icon": "resource://webidl2mdn-jetpack-at-addons-dot-mozilla-dot-org/data/posts-48.png",
   "license": "MIT",
   "keywords": [
     "jetpack"
