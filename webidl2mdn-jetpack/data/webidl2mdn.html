@@ -7,18 +7,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=yes">
     <link rel="icon" href="posts-48.png" id="favicon" type="image/png">
     <link rel="stylesheet" href="webidl2mdn.css">
-    <!--                 <script src="my-utils.js"></script> -->
+    <!-- https://developer.mozilla.org/en-US/docs/Inbox/User%3Amaybe/webidl_mdn -->
+    <base href="https://developer.mozilla.org/" target="_blank">
   </head>
   <body role="application">
     <h1 id="title" data-l10n-id="title">Webidl to MDN Docs</h1>
     <div id="production">production note</div>
     <span id="application_description_toggle">&blacktriangleright;</span>
     <pre class="info" id="application_description" data-l10n-id="addon_description">DESCRIPTION</pre>
-    <label>Overview Tags
-      <input id="overview_tags" readonly length="80" class="tags" type="text"/>
-    </label>
-    <span id="overview_toggle">&blacktriangleright;</span>
-    <textarea readonly cols="80" rows="40" id="overview_source"></textarea>
+    <h2>Overview page tags</h2>
+    <p>Copy below tags to <a id="mdn_overview_tags_url" href>tags field of page on MDN</a> after you copied source to the page.</p>
+    <input id="overview_tags" readonly size="80" class="tags" type="text"/>
+    <h2>Overview page destination</h2>
+    <p>Select or type a relative path to where under MDN you want to put the generate content.</p>
+    <select id="url_sub_tree_select">
+      <option selected>en-US/docs/Web/API/</option>
+      <!-- MDN will sanitize characters like : -->
+      <option>en-US/docs/Inbox/User:maybe/webidl_mdn/</option>
+    </select>
+    <input id="url_sub_tree" pattern="((-|:|\w)+/)+$" size="80" type="text"/>
+    <p><a id="mdn_overview_url" href>Visit page on MDN</a>. You may want to copy source code from below.</p>
+    <span title="toogle to copy to MDN (edit at own risk)" id="overview_toggle">&blacktriangleright;</span>
+    <pre contenteditable id="overview_source"></pre>
     <!-- Taken from https://developer.mozilla.org/en-US/Add-ons/SDK/High-Level_APIs/simple-prefs -->
     <!-- tt = document.querySelectorAll('h4#Preference_Types~table.standard-table tr') -->
     <!-- Array.prototype.forEach.call(tt, function(v, i, obj) { console.log(v.firstElementChild.textContent); }); -->
@@ -43,75 +53,26 @@
     <!-- https://developer.mozilla.org/en-US/docs/MDN/Contribute/Howto/Write_an_API_reference#Structure_of_an_overview_page -->
     <template class="overview">
       <section class="overview">
-        <div>
-          <p>The Web Audio API provides a powerful and versatile system for controlling audio on the Web, allowing developers to choose audio sources, add effects to audio, create audio visualizations, apply spatial effects (such as panning)&nbsp; and much more.</p>
+        <div id="overview_description">
+          <p>The <span class="api_name">API_NAME</span> API overview description goes here.</p>
         </div>
-
-        <h2 id="concepts_and_usage">Web audio concepts and usage</h2>
-
-        <p>The Web Audio API involves handling audio operations inside an <strong>audio context</strong>, and has been designed to allow <strong>modular routing</strong>. Basic audio operations are performed with <strong>audio nodes</strong>, which are linked together to form an <strong>audio routing graph</strong>. Several sources — with different types of channel layout — are supported even within a single context. This modular design provides the flexibility to create complex audio functions with dynamic effects.</p>
-
-        <p>Audio nodes are linked via their inputs and outputs, forming a chain that starts with one or more sources, goes through one or more nodes, then ends up at a destination (although you don't have to provide a destination if you, say, just want to visualise some audio data.) A simple, typical workflow for web audio would look something like this:</p>
-
-        <ol>
-          <li>Create audio context</li>
-          <li>Inside the context, create sources — such as <code>&lt;audio&gt;</code>, oscillator, stream</li>
-          <li>Create effects nodes, such as reverb, biquad filter, panner, compressor</li>
-          <li>Choose final destination of audio, for example your system speakers</li>
-          <li>Connect the sources up to the effects, and the effects to the destination.</li>
-        </ol>
-
-        <p><img alt="A simple box diagram with an outer box labeled Audio context, and three inner boxes labeled Sources, Effects and Destination. The three inner boxes have arrow between them pointing from left to right, indicating the flow of audio information." src="https://mdn.mozillademos.org/files/7893/web-audio-api-flowchart.png" style="display:block; height:113px; margin:0px auto; width:635px" /></p>
-
-        <p>Timing is controlled with high precision and low latency, allowing developers to write code that responds accurately to events and is able to target specific samples, even at a high sample rate. So applications such as drum machines and sequencers are well within reach.</p>
-
-        <p>The Web Audio API also allows us to control how audio is <em>spatialized</em>. Using a system based on a <em>source-listener model</em>, it allows control of the <em>panning model</em> and deals with <em>distance-induced attenuation</em> or <em>doppler shift</em> induced by a moving source (or moving listener).</p>
-
-        <div class="note">
-          <p><strong>Note</strong>: You can read about the theory of the Web Audio API in a lot more detail in our article <a href="/en-US/docs/Web/API/Web_Audio_API/Basic_concepts_behind_Web_Audio_API">Basic concepts behind Web Audio API</a>.</p>
-        </div>
-
-        <h2 id="interfaces">Web Audio API Interfaces</h2>
-
-        <p>The Web Audio API has a total of 28 interfaces and associated events, which we have split up into nine categories of functionality.</p>
-
-        <h3 id="General_audio_graph_definition">General audio graph definition</h3>
-
-        <p>General containers and definitions that shape audio graphs in Web Audio API usage.</p>
-
-        <dl>
-          <dt>{{domxref("AudioContext")}}</dt>
-          <dd>The <strong><code>AudioContext</code></strong> interface represents an audio-processing graph built from audio modules linked together, each represented by an {{domxref("AudioNode")}}. An audio context controls the creation of the nodes it contains and the execution of the audio processing, or decoding. You need to create an <code>AudioContext</code> before you do anything else, as everything happens inside a context.</dd>
-          <dt>{{domxref("AudioNode")}}</dt>
-          <dd>The <strong><code>AudioNode</code></strong><strong> </strong>interface represents an audio-processing module like an <em>audio source</em> (e.g. an HTML {{HTMLElement("audio")}} or {{HTMLElement("video")}} element), <em>audio destination</em>, <em>intermediate processing module</em> (e.g. a filter like {{domxref("BiquadFilterNode")}}, or volume control like {{domxref("GainNode")}}).</dd>
-          <dt>{{domxref("AudioParam")}}</dt>
-          <dd>The <strong><code>AudioParam</code></strong><strong> </strong>interface represents an audio-related parameter, like one of an {{domxref("AudioNode")}}. It can be set to a specific value or a change in value, and can be scheduled to happen at a specific time and following a specific pattern.</dd>
-          <dt>{{event("ended_(Web_Audio)", "ended")}} (event)</dt>
-          <dd>The <code>ended</code> event is fired when playback has stopped because the end of the media was reached.</dd>
+        <h2 id="concepts_and_usage"><span class="api_name">API_NAME</span> concepts and usage</h2>
+        <h2 id="interfaces"><span class="api_name">API_NAME</span> API Interfaces</h2>
+        <dl id="interface_definitions">
         </dl>
-
         <h2 id="Obsolete_interfaces" name="Obsolete_interfaces">Obsolete interfaces</h2>
-
-        <p>The following interfaces were defined in old versions of the Web Audio API spec, but are now obsolete and have been replaced by other interfaces.</p>
-
-        <dl>
-          <dt>{{domxref("JavaScriptNode")}}</dt>
-          <dd>Used for direct audio processing via JavaScript. This interface is obsolete, and has been replaced by {{domxref("ScriptProcessorNode")}}.</dd>
-          <dt>{{domxref("WaveTableNode")}}</dt>
-          <dd>Used to define a periodic waveform. This interface is obsolete, and has been replaced by {{domxref("PeriodicWave")}}.</dd>
+        <p>The following interfaces were defined in old versions of the <span class="api_name">API_NAME</span> API spec, but are now obsolete and have been replaced by other interfaces.</p>
+        <dl id="interface_definitions_obsolete">
         </dl>
-
         <h2 id="Example" name="Example">Example</h2>
-
-        <p>This example shows a wide variety of Web Audio API functions being used. You can see this code in action on the <a href="http://mdn.github.io/voice-change-o-matic/">Voice-change-o-matic</a> demo (also check out the <a href="https://github.com/mdn/voice-change-o-matic">full source code at Github</a>) — this is an experimental voice changer toy demo; keep your speakers turned down low when you use it, at least to start!</p>
-
-        <p>The Web Audio API lines are highlighted; if you want to find more out about what the different methods, etc. do, have a search around the reference pages.</p>
-
-        <pre class="brush: js; highlight:[1,2,9,10,11,12,36,37,38,39,40,41,62,63,72,114,115,121,123,124,125,147,151]">
-</pre>
-
+        <p>This example shows a wide variety of <span class="api_name">API_NAME</span> API functions being used.</p>
+        <pre class="brush: js; highlight:[1, 3, 4]">
+//
+// Comment this <span class="api_name">API_NAME</span> API example to provide some
+// context for standalone use, very important for incorrect examples.
+//
+        </pre>
         <h2 id="Specifications">Specifications</h2>
-
         <table class="standard-table">
           <tbody>
             <tr>
@@ -120,17 +81,14 @@
               <th scope="col">Comment</th>
             </tr>
             <tr>
-              <td>{{SpecName('Web Audio API')}}</td>
-              <td>{{Spec2('Web Audio API')}}</td>
+              <td>{{SpecName("<span class="api_name">API_NAME</span>")}}</td>
+              <td>{{Spec2("<span class="api_name">API_NAME</span>")}}</td>
               <td>&nbsp;</td>
             </tr>
           </tbody>
         </table>
-
         <h2 id="Browser_compatibility">Browser compatibility</h2>
-
         <div>{{CompatibilityTable}}</div>
-
         <div id="compat-desktop">
           <table class="compat-table">
             <tbody>
@@ -156,7 +114,6 @@
             </tbody>
           </table>
         </div>
-
         <div id="compat-mobile">
           <table class="compat-table">
             <tbody>
@@ -183,131 +140,15 @@
             </tbody>
           </table>
         </div>
-
         <h2 id="See_also">See also</h2>
-
         <ul>
-          <li><a href="/en-US/docs/Web/API/Web_Audio_API/Using_Web_Audio_API">Using the Web Audio API</a></li>
-          <li><a href="/en-US/docs/Web/API/Web_Audio_API/Visualizations_with_Web_Audio_API">Visualizations with Web Audio API</a></li>
-          <li><a href="http://mdn.github.io/voice-change-o-matic/">Voice-change-O-matic example</a></li>
-          <li><a href="http://mdn.github.io/violent-theremin/">Violent Theremin example</a></li>
-          <li><a href="/en-US/docs/Web/API/Web_Audio_API/Web_audio_spatialisation_basics">Web audio spatialisation basics</a></li>
-          <li><a href="http://www.html5rocks.com/tutorials/webaudio/positional_audio/" title="http://www.html5rocks.com/tutorials/webaudio/positional_audio/">Mixing Positional Audio and WebGL</a></li>
-          <li><a href="http://www.html5rocks.com/tutorials/webaudio/games/" title="http://www.html5rocks.com/tutorials/webaudio/games/">Developing Game Audio with the Web Audio API</a></li>
-          <li><a href="/en-US/docs/Web/API/Web_Audio_API/Porting_webkitAudioContext_code_to_standards_based_AudioContext" title="/en-US/docs/Web_Audio_API/Porting_webkitAudioContext_code_to_standards_based_AudioContext">Porting webkitAudioContext code to standards based AudioContext</a></li>
-          <li><a href="https://github.com/bit101/tones">Tones</a>: a simple library for playing specific tones/notes using the Web Audio API.</li>
-          <li><a href="https://github.com/goldfire/howler.js/">howler.js</a>: a JS audio library that defaults to <a href="https://dvcs.w3.org/hg/audio/raw-file/tip/webaudio/specification.html">Web Audio API</a> and falls back to <a href="http://www.whatwg.org/specs/web-apps/current-work/#the-audio-element">HTML5 Audio</a>, as well as providing other useful features.</li>
-          <li><a href="https://github.com/mattlima/mooog">Mooog</a>: jQuery-style chaining of AudioNodes, mixer-style sends/returns, and more.</li>
+          <li>{{domxref("<span class="api_name">API_NAME</span>")}}</li>
         </ul>
-
-        <section id="Quick_Links">
-          <h3 id="Quicklinks">Quicklinks</h3>
-
-          <ol>
-            <li data-closed="" data-default-state="open"><strong><a href="#">Guides</a></strong>
-
-              <ol>
-                <li><a href="/en-US/docs/Web/API/Web_Audio_API/Basic_concepts_behind_Web_Audio_API">Basic concepts behind Web Audio API</a></li>
-                <li><a href="/en-US/docs/Web/API/Web_Audio_API/Using_Web_Audio_API">Using the Web Audio API</a></li>
-                <li><a href="/en-US/docs/Web/API/Web_Audio_API/Visualizations_with_Web_Audio_API">Visualizations with Web Audio API</a></li>
-                <li><a href="/en-US/docs/Web/API/Web_Audio_API/Web_audio_spatialisation_basics">Web audio spatialisation basics</a></li>
-                <li><a href="/en-US/docs/Web/API/Web_Audio_API/Porting_webkitAudioContext_code_to_standards_based_AudioContext" title="/en-US/docs/Web_Audio_API/Porting_webkitAudioContext_code_to_standards_based_AudioContext">Porting webkitAudioContext code to standards based AudioContext</a></li>
-              </ol>
-            </li>
-            <li data-closed="" data-default-state="open"><strong><a href="#">Examples</a></strong>
-              <ol>
-                <li><a href="http://mdn.github.io/voice-change-o-matic/">Voice-change-O-matic</a></li>
-                <li><a href="http://mdn.github.io/violent-theremin/">Violent Theremin</a></li>
-              </ol>
-            </li>
-            <li data-closed="" data-default-state="open"><strong><a href="#">Interfaces</a></strong>
-              <ol>
-                <li>{{domxref("AnalyserNode")}}</li>
-                <li>{{domxref("AudioBuffer")}}</li>
-                <li>{{domxref("AudioBufferSourceNode")}}</li>
-                <li>{{domxref("AudioContext")}}</li>
-                <li>{{domxref("AudioDestinationNode")}}</li>
-                <li>{{domxref("AudioListener")}}</li>
-                <li>{{domxref("AudioNode")}}</li>
-                <li>{{domxref("AudioParam")}}</li>
-                <li>{{event("audioprocess")}} (event)</li>
-                <li>{{domxref("AudioProcessingEvent")}}</li>
-                <li>{{domxref("BiquadFilterNode")}}</li>
-                <li>{{domxref("ChannelMergerNode")}}</li>
-                <li>{{domxref("ChannelSplitterNode")}}</li>
-                <li>{{event("complete")}} (event)</li>
-                <li>{{domxref("ConvolverNode")}}</li>
-                <li>{{domxref("DelayNode")}}</li>
-                <li>{{domxref("DynamicsCompressorNode")}}</li>
-                <li>{{event("ended_(Web_Audio)", "ended")}} (event)</li>
-                <li>{{domxref("GainNode")}}</li>
-                <li>{{domxref("MediaElementAudioSourceNode")}}</li>
-                <li>{{domxref("MediaStreamAudioDestinationNode")}}</li>
-                <li>{{domxref("MediaStreamAudioSourceNode")}}</li>
-                <li>{{domxref("OfflineAudioCompletionEvent")}}</li>
-                <li>{{domxref("OfflineAudioContext")}}</li>
-                <li>{{domxref("OscillatorNode")}}</li>
-                <li>{{domxref("PannerNode")}}</li>
-                <li>{{domxref("PeriodicWaveNode")}}</li>
-                <li>{{domxref("ScriptProcessorNode")}}</li>
-                <li>{{domxref("WaveShaperNode")}}</li>
-              </ol>
-            </li>
-          </ol>
-        </section>
       </section>
     </template>
-    <template class="boolint">
-      <input class="boolint" name="PREF_NAME" type="checkbox"/>
-    </template>
-    <template class="integer">
-      <input class="integer" name="PREF_NAME" type="number" step="1"/>
-    </template>
-    <template class="string">
-      <div class="string settings">
-        <label>TITLE
-        </label>
-        <pre class="string" name="PREF_NAME" contentEditable></pre>
-        <p>DESCRIPTION</p>
-      </div>
-    </template>
-    <template class="color">
-      <input class="color" name="PREF_NAME" type="color"/>
-    </template>
-    <template class="file">
-      <input class="file" name="PREF_NAME" type="file"/>
-    </template>
-    <template class="directory">
-      <input class="directory" name="PREF_NAME" type="directory"/>
-    </template>
-    <template class="menulist">
-      <div class="menulist settings">
-        <label>TITLE
-        </label>
-        <select class="menulist"></select>
-        <p>DESCRIPTION</p>
-      </div>
-    </template>
-    <template class="menulist_item">
-      <option class="menulist_item"></option>
-    </template>
-    <template class="radio">
-      <div class="radio settings">
-        <label>TITLE</label>
-        <span class="radio"></span>
-        <p>DESCRIPTION</p>
-      </div>
-    </template>
-    <template class="radio_item">
-      <input class="radio_item" id="PREF_NAME" name="PREF_NAME" type="radio"/>
-      <label for="PREF_NAME" class="radio">TITLE</label>
-    </template>
-    <template class="control">
-      <div class="control settings">
-        <label>TITLE</label>
-        <input class="control" name="PREF_NAME" type="button"/>
-        <p>DESCRIPTION</p>
-      </div>
+    <template class="interface_definition">
+      <dt>{{domxref("<span class="interface_name">INTERFACE_NAME</span>")}}</dt>
+      <dd>The <strong><code><span class="interface_name">INTERFACE_NAME</span>"</code></strong> interface IS_DESCRIBED_HERE</dd>
     </template>
   </body>
 </html>

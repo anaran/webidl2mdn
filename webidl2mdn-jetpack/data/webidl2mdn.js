@@ -25,6 +25,7 @@
       console.log('load_webidl2mdn', data);
       let path = data.source.split('/');
       let nameOfApi = data.source.match(/([^\/]+)\.webidl\b/)[1];
+      document.getElementById('favicon').href = data.icon;
       let applicationDescription = document.getElementById('application_description');
       let applicationDescriptionToggle = document.getElementById('application_description_toggle');
       // NOTE: Keep this first, before adding nodes to document.
@@ -51,95 +52,66 @@
       let overview = document.querySelector('template.overview').content;
       let overviewUI = document.importNode(overview, "deep").firstElementChild;
       document.body.appendChild(overviewUI);
+      // document.head.appendChild(document.createElement("base")).href = "https://developer.mozilla.org/";
       document.title = 'Generated MDN Skeletons for API ' + nameOfApi;
       document.querySelector('h1#title').textContent = document.title;
       document.querySelector('div#production').textContent = 'Produced from ' + data.source;
       let overviewInterfacesHeadline = overviewUI.querySelector('h2#interfaces');
       overviewInterfacesHeadline.textContent = nameOfApi + ' Interfaces';
       let overviewSource = document.getElementById('overview_source');
+      let mdnOverviewUrl = document.getElementById('mdn_overview_url');
+      let mdnOverviewTagsUrl = document.getElementById('mdn_overview_tags_url');
+      let subTreeSelect = document.getElementById('url_sub_tree_select');
+      let subTreeInput = document.getElementById('url_sub_tree');
+      subTreeSelect.addEventListener('change', function (event) {
+        subTreeInput.value = event.target.value;
+        mdnOverviewUrl.href = subTreeInput.value + nameOfApi + "_API$edit";
+        mdnOverviewTagsUrl.href = mdnOverviewUrl + '#page-tags';
+      });
+      subTreeInput.addEventListener('input', function (event) {
+        mdnOverviewUrl.href = subTreeInput.value + nameOfApi + "_API$edit";
+        mdnOverviewTagsUrl.href = mdnOverviewUrl + '#page-tags';
+      });
       let overviewTags = document.getElementById('overview_tags');
-      overviewTags.value = "Overview, API";
-      overviewUI.normalize();
-      overviewSource.value = overviewUI.innerHTML;
+      overviewTags.value = "Overview, API, Reference, " + nameOfApi + " API";
       overviewSource.style['display'] = 'none';
       let overviewToggle = document.getElementById('overview_toggle');
       overviewToggle.addEventListener('click', function (event) {
         if (overviewSource.style['display'] != 'none') {
-          overviewSource.style['display'] = 'none';
-          overviewUI.style['display'] = 'block';
+          overviewUI.innerHTML = overviewSource.textContent;
+          window.requestAnimationFrame(function(domHighResTimeStamp) {
+            overviewSource.style['display'] = 'none';
+            overviewUI.style['display'] = 'block';
+          });
         }
         else {
           overviewSource.style['display'] = 'block';
           overviewUI.style['display'] = 'none';
         }
       });
+      Array.prototype.forEach.call(document.body.querySelectorAll('span.api_name'), function (element) {
+        element.parentElement.replaceChild(document.createTextNode(nameOfApi), element);
+      });
       // See https://developer.mozilla.org/en-US/docs/MDN/Contribute/Howto/Write_an_API_reference
+      let interfaceDefinitionList = document.getElementById('interface_definitions');
       data.AST.forEach(function (value) {
-        let content = document.querySelector('template.' + syntaxElement.type).content;
-        let syntaxUI = document.importNode(content, "deep").firstElementChild;
-        let label = syntaxUI.children[0];
-        let element = syntaxUI.children[1];
-        let description = syntaxUI.children[2];
-        label.textContent = syntaxElement.title;
-        description.textContent = syntaxElement.description;
-        // label.setAttribute('data-l10n-id', syntaxElement.name + '_title');
-        // description.setAttribute('data-l10n-id', syntaxElement.name + '_description');
-        switch (syntaxElement.type) {
+        switch (value.type) {
           case "dictionary": {
-            element.checked = data.prefs[syntaxElement.name];
-            element.addEventListener('change', function(event) {
-            });
-            element.name = value.name;
             break;
           }
           case "enum": {
-            element.value = value.label;
-            element.addEventListener('click', function(event) {
-              self.port.emit('save_setting', {
-                name: value.name,
-                value: event.target.textContent
-              });
-            });
             break;
           }
           case "interface": {
-            // NOTE: We JSON.parse preferences starting with JSON and report errors.
-            let isJson = /^JSON/.test(value.name);
-            element.textContent = data.prefs[value.name];
-            // NOTE: Thanks
-            // https://github.com/jrburke/gaia/commit/204a4b0c55eafbb20dfaa233fbbf2579a8f81915
-            element.addEventListener('paste', function(event) {
-              event.preventDefault();
-              var text = event.clipboardData.getData('text/plain');
-              if (isJson) {
-                text = tryConvertToJson(text);
-              }
-              // Only insert if text. If no text, the execCommand fails with an
-              // error.
-              if (text) {
-                document.execCommand('insertText', false, text);
-              }
-            });
-            isJson && element.addEventListener('blur', function(event) {
-              try {
-                event.target.textContent = event.target.textContent.trim();
-                if (event.target.textContent.length == 0) {
-                  event.target.textContent = "{}";
-                }
-                // NOTE: This regexp might not catch all cases, so let's just try always
-                // if (/'|:[^\/]|^\s*\/\//.test(event.target.textContent)) {
-                event.target.textContent = tryConvertToJson(event.target.textContent);
-                // }
-                event.target.textContent = JSON.stringify(JSON.parse(event.target.textContent), null, 2);
-                self.port.emit('save_setting', {
-                  name: value.name,
-                  value: event.target.textContent
-                });
-                element.name = value.name;
-              }
-              catch (e) {
-                // reportError(event.target);
-              }
+            let interfaceDefinition = document.querySelector('template.interface_definition').content;
+            let interfaceDefinitionUI = document.importNode(interfaceDefinition, "deep");
+            // interfaceDefinitionList.appendChild(interfaceDefinitionUI);
+            interfaceDefinitionList.appendChild(interfaceDefinitionUI.children[0]);
+            // FIXME: why does index of element [1] move down to [0]
+            interfaceDefinitionList.appendChild(interfaceDefinitionUI.children[0]);
+            // FIXME: Should only replace in one pair, not whole dl.
+            Array.prototype.forEach.call(interfaceDefinitionList.querySelectorAll('.interface_name'), function (element) {
+              element.parentElement.replaceChild(document.createTextNode(value.name), element);
             });
             break;
           }
@@ -189,8 +161,9 @@
             break;
           }
         }
-        document.body.appendChild(syntaxUI);
       });
+      document.normalize();
+      overviewSource.textContent = overviewUI.innerHTML;
     }
     catch (e) {
       console.log('exception', JSON.stringify(e, Object.keys(e), 2), e.toString());

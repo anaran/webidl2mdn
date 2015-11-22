@@ -9,6 +9,7 @@
     "firefox": ">=38.0a1",
     "fennec": ">=38.0a1"
   },
+  "icon": "resource://webidl2mdn-jetpack/data/posts-48.png",
   "license": "MIT",
   "keywords": [
     "jetpack"

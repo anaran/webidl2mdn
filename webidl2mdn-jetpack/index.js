@@ -96,9 +96,11 @@ tabs.on('load', function(tab) {
             if (this.readyState == xhr.DONE && xhr.responseText.length) {
               console.log('xhr.responseText', xhr.responseText);
               try {
+                let package = require('./package.json');
                 let tree2 = WebIDL2.parse(xhr.responseText);
                 console.log(JSON.stringify(tree2, null, 2));
                 webidl2mdnWorker.port.emit('load_webidl2mdn', {
+                  icon: package.icon,
                   source: originallyActiveTab.url,
                   AST: tree2
                 });
