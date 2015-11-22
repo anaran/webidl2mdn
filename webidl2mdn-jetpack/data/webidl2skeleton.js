@@ -22,7 +22,7 @@
   // self is undefined when using require in jpm test.
   (typeof self !== 'undefined') && self.port.on('load_webidl2mdn', function(data) {
     try {
-      console.log('load_webidl2mdn', data);
+      DEBUG_ADDON && console.log('load_webidl2mdn', data);
       let path = data.url.split('/');
       let nameOfApi = data.url.match(/([^\/]+)\.webidl\b/)[1];
       document.getElementById('favicon').href = data.icon;
@@ -72,14 +72,46 @@
         mdnOverviewUrl.href = subTreeInput.value + nameOfApi + "_API$edit";
         mdnOverviewTagsUrl.href = mdnOverviewUrl + '#page-tags';
       });
+      // subTreeInput.addEventListener('change', function (event) {
+      //   mdnOverviewUrl.href = subTreeInput.value + nameOfApi + "_API$edit";
+      //   mdnOverviewTagsUrl.href = mdnOverviewUrl + '#page-tags';
+      // });
       mdnOverviewUrl.addEventListener('click', function (event) {
         event.preventDefault();
-        self.port.emit('request_skeleton2mdn', {
-          source: overviewSource.textContent,
-          tags: overviewTags.value,
-          url: event.target.href
-        })
+        let xhr = new XMLHttpRequest();
+        xhr.open('GET', event.target.href);
+        xhr.onload = function () {
+          if (this.readyState == xhr.DONE) {
+            switch (this.statusText) {
+              case "OK": {
+                self.port.emit('request_skeleton2mdn', {
+                  source: overviewSource.textContent,
+                  tags: overviewTags.value,
+                  url: event.target.href
+                });
+                break;
+              }
+              case "NOT FOUND": {
+                self.port.emit('request_skeleton2mdn', {
+                  source: overviewSource.textContent,
+                  tags: overviewTags.value,
+                  url: event.target.href.replace(/\$edit/, '')
+                });
+                break;
+              }
+            }
+            DEBUG_ADDON && console.log('xhr.responseText', xhr.responseText);
+          }
+        };
+        xhr.send();
       });
+      // subTreeSelect.select(1);
+      // subTreeSelect.select(0);
+      subTreeSelect.selectedIndex = -1;
+      // subTreeSelect.selectedIndex = 1;
+      // if (subTreeSelect.selectedIndex != -1) {
+      //   subTreeInput.value = subTreeSelect.options[subTreeSelect.selectedIndex].value;
+      // }
       let overviewTags = document.getElementById('overview_tags');
       overviewTags.value = "Overview, API, Reference, " + nameOfApi + " API";
       overviewSource.style['display'] = 'none';
@@ -177,7 +209,7 @@
       overviewSource.textContent = overviewUI.innerHTML;
     }
     catch (e) {
-      console.log('exception', JSON.stringify(e, Object.keys(e), 2), e.toString());
+      DEBUG_ADDON && console.log('exception', JSON.stringify(e, Object.keys(e), 2), e.toString());
     }
   });
   // self is undefined when using require in jpm test.

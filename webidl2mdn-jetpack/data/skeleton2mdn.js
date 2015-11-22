@@ -14,24 +14,29 @@
 // (function() {
 let DEBUG_ADDON = false;
 
-// self is undefined when using require in jpm test.
-(typeof self !== 'undefined') && self.port.on('load_editMdn', function(data) {
-  try {
-    let toggleSource = document.getElementById('cke_14');
-    if (toggleSource) {
-      toggleSource.click();
-      let sourceTextarea = document.querySelector('textarea.cke_source.cke_editable');
-      let sourceTags = document.querySelector('.tagit-new>input');
-      if (sourceTextarea && sourceTags) {
-        sourceTextarea.value = data.source + sourceTextarea.value;
-        sourceTags.value = data.tags;
+typeof document != 'undefined' && document.addEventListener('readystatechange', function (event) {
+  if (document.readyState == 'complete') {
+    // self is undefined when using require in jpm test.
+    (typeof self !== 'undefined') && self.port.on('load_editMdn', function(data) {
+      try {
+        let toggleSource = document.getElementById('cke_14');
+        console.log('toggleSource', toggleSource);
+        if (toggleSource) {
+          toggleSource.click();
+          let sourceTextarea = document.querySelector('textarea.cke_source.cke_editable');
+          let sourceTags = document.querySelector('.tagit-new>input');
+          if (sourceTextarea && sourceTags) {
+            sourceTextarea.value = data.source + sourceTextarea.value;
+            sourceTags.value = data.tags;
+          }
+        }
       }
-    }
-  }
-  catch (e) {
-    console.log('exception', JSON.stringify(e, Object.keys(e), 2), e.toString());
+      catch (e) {
+        console.log('exception', JSON.stringify(e, Object.keys(e), 2), e.toString());
+      }
+    });
+    // self is undefined when using require in jpm test.
+    (typeof self !== 'undefined') && self.port.emit('request_editMdn');
+    // })();
   }
 });
-// self is undefined when using require in jpm test.
-(typeof self !== 'undefined') && self.port.emit('request_editMdn');
-// })();

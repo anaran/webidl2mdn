@@ -6,6 +6,9 @@
   "description": "Create MDN API Reference Skeletons from WebIDL",
   "main": "index.js",
   "author": "anaran",
+  "dependencies": {
+    "webidl2": "^2.0.11"
+  },
   "engines": {
     "firefox": ">=38.0a1",
     "fennec": ">=38.0a1"
@@ -15,7 +18,7 @@
   "keywords": [
     "jetpack"
   ],
-  "dependencies": {
-    "webidl2": "^2.0.11"
+  "permissions": {
+    "cross-domain-content": ["https://developer.mozilla.org/"]
   }
 }
