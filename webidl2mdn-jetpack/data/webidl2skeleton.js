@@ -36,10 +36,17 @@
       applicationDescriptionToggle.addEventListener('click', function (event) {
         if (applicationDescription.style['white-space'] != 'pre') {
           applicationDescription.style['white-space'] = 'pre';
+          applicationDescriptionToggle.innerHTML = '&blacktriangledown;';
+          applicationDescriptionToggle.style['position'] = 'fixed';
         }
         else {
-          // applicationDescription.style['overflow'] = 'hidden';
           applicationDescription.style['white-space'] = 'nowrap';
+          applicationDescriptionToggle.innerHTML = '&blacktriangleright;';
+          applicationDescriptionToggle.style['position'] = 'relative';
+          let y = applicationDescriptionToggle.getBoundingClientRect().y;
+          if (y < 0) {
+            applicationDescriptionToggle.scrollIntoView();
+          }
         }
       });
       // SEE ALSO Pages
@@ -58,10 +65,11 @@
       document.querySelector('div#production').textContent = 'Produced from ' + data.url;
       let overviewInterfacesHeadline = overviewUI.querySelector('h2#interfaces');
       overviewInterfacesHeadline.textContent = nameOfApi + ' Interfaces';
-      let overviewSource = document.getElementById('overview_source');
-      let mdnOverviewUrl = document.getElementById('mdn_overview_url');
-      let subTreeSelect = document.getElementById('url_sub_tree_select');
-      let subTreeInput = document.getElementById('url_sub_tree');
+      let overviewSource = overviewUI.querySelector('.source');
+      let overviewContent = overviewUI.querySelector('.content');
+      let mdnOverviewUrl = overviewUI.querySelector('.mdn_overview_url');
+      let subTreeSelect = document.body.querySelector('#url_sub_tree_select');
+      let subTreeInput = document.body.querySelector('#url_sub_tree');
       subTreeSelect.addEventListener('change', function (event) {
         subTreeInput.value = event.target.value;
         mdnOverviewUrl.href = subTreeInput.value + nameOfApi + "_API$edit";
@@ -108,28 +116,66 @@
       ];
       overviewTags.value = overviewPageTags.toString();
       overviewSource.style['display'] = 'none';
-      let overviewToggle = document.getElementById('overview_toggle');
-      overviewToggle.addEventListener('click', function (event) {
+      let overviewEditToggle = overviewUI.querySelector('.edit_toggle');
+      let overviewToggleDiv = overviewUI.querySelector('.toggles');
+      overviewEditToggle.addEventListener('click', function (event) {
+        let bcr = overviewToggleDiv.getBoundingClientRect();
         if (overviewSource.style['display'] != 'none') {
-          overviewUI.innerHTML = overviewSource.textContent;
+          overviewContent.innerHTML = overviewSource.textContent;
           window.requestAnimationFrame(function(domHighResTimeStamp) {
             overviewSource.style['display'] = 'none';
-            overviewUI.style['display'] = 'block';
+            overviewContent.style['display'] = 'block';
+            overviewEditToggle.style['opacity'] = 1.0;
+            overviewOverflowToggle.style['visibility'] = 'visible';
+            overviewToggleDiv.style['position'] = 'relative';
+            overviewToggleDiv.style['top'] = '0';
           });
+          if (bcr.y < 0) {
+            overviewToggleDiv.scrollIntoView();
+          }
         }
         else {
           overviewSource.style['display'] = 'block';
-          overviewUI.style['display'] = 'none';
+          overviewContent.style['display'] = 'none';
+          overviewEditToggle.style['opacity'] = 0.5;
+          overviewOverflowToggle.style['visibility'] = 'hidden';
+          overviewToggleDiv.style['position'] = 'fixed';
+          overviewToggleDiv.style['top'] = bcr.top + 'px';
         }
       });
-      Array.prototype.forEach.call(document.body.querySelectorAll('span.api_name'), function (element) {
+      let overviewOverflowToggle = overviewUI.querySelector('.overflow_toggle');
+      overviewOverflowToggle.addEventListener('click', function (event) {
+        let bcr = overviewToggleDiv.getBoundingClientRect();
+        if (overviewContent.style['height'] == '100%') {
+          window.requestAnimationFrame(function(domHighResTimeStamp) {
+            overviewContent.style['height'] = '3rem';
+            overviewSource.style['white-space'] = 'nowrap';
+            overviewOverflowToggle.innerHTML = '&blacktriangleright;';
+            overviewEditToggle.style['visibility'] = 'hidden';
+            overviewToggleDiv.style['position'] = 'relative';
+            overviewToggleDiv.style['top'] = '0';
+          });
+          if (bcr.y < 0) {
+            overviewToggleDiv.scrollIntoView();
+          }
+        }
+        else {
+          overviewContent.style['height'] = '100%';
+          overviewSource.style['white-space'] = 'pre';
+          overviewOverflowToggle.innerHTML = '&blacktriangledown;';
+          overviewEditToggle.style['visibility'] = 'visible';
+          overviewToggleDiv.style['position'] = 'fixed';
+          overviewToggleDiv.style['top'] = bcr.top + 'px';
+        }
+      });
+      Array.prototype.forEach.call(overviewContent.querySelectorAll('span.api_name'), function (element) {
         element.parentElement.replaceChild(document.createTextNode(nameOfApi), element);
       });
-      Array.prototype.forEach.call(document.body.querySelectorAll('span.generator_name'), function (element) {
+      Array.prototype.forEach.call(overviewContent.querySelectorAll('span.generator_name'), function (element) {
         element.parentElement.replaceChild(document.createTextNode(data.generator + ' from ' + data.url), element);
       });
       // See https://developer.mozilla.org/en-US/docs/MDN/Contribute/Howto/Write_an_API_reference
-      let interfaceDefinitionList = document.getElementById('interface_definitions');
+      let interfaceDefinitionList = overviewContent.querySelector('#interface_definitions');
       data.AST.forEach(function (value) {
         switch (value.type) {
           case "dictionary": {
@@ -142,9 +188,10 @@
             let interfaceDefinition = document.querySelector('template.interface_definition').content;
             let interfaceDefinitionUI = document.importNode(interfaceDefinition, "deep");
             // interfaceDefinitionList.appendChild(interfaceDefinitionUI);
-            interfaceDefinitionList.appendChild(interfaceDefinitionUI.children[0]);
+            interfaceDefinitionList.appendChild(interfaceDefinitionUI);
+            // interfaceDefinitionList.appendChild(interfaceDefinitionUI.children[0]);
             // FIXME: why does index of element [1] move down to [0]
-            interfaceDefinitionList.appendChild(interfaceDefinitionUI.children[0]);
+            // interfaceDefinitionList.appendChild(interfaceDefinitionUI.children[0]);
             // FIXME: Should only replace in one pair, not whole dl.
             Array.prototype.forEach.call(interfaceDefinitionList.querySelectorAll('.interface_name'), function (element) {
               element.parentElement.replaceChild(document.createTextNode(value.name), element);
@@ -176,7 +223,7 @@
         }
       });
       document.normalize();
-      overviewSource.textContent = overviewUI.innerHTML;
+      overviewSource.textContent = overviewContent.innerHTML;
     }
     catch (e) {
       DEBUG_ADDON && console.log('exception', JSON.stringify(e, Object.keys(e), 2), e.toString());

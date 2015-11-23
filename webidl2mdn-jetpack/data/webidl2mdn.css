@@ -5,6 +5,18 @@ pre.info {
   text-overflow: ellipsis ellipsis;
 }
 
+pre.source {
+  width: 90%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis ellipsis;
+}
+
+div.overview section.content {
+  overflow: hidden;
+  height: 3rem;
+}
+
 textarea.overview_source {
   resize: both;
 }
