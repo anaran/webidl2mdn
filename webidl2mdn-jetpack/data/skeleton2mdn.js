@@ -27,7 +27,11 @@ typeof document != 'undefined' && document.addEventListener('readystatechange', 
           let sourceTags = document.querySelector('.tagit-new>input');
           if (sourceTextarea && sourceTags) {
             sourceTextarea.value = data.source + sourceTextarea.value;
-            sourceTags.value = data.tags;
+            data.tags.forEach(function (tag) {
+              sourceTags.focus();
+              sourceTags.value = tag;
+              sourceTags.blur();
+            });
           }
         }
       }

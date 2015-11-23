@@ -60,22 +60,15 @@
       overviewInterfacesHeadline.textContent = nameOfApi + ' Interfaces';
       let overviewSource = document.getElementById('overview_source');
       let mdnOverviewUrl = document.getElementById('mdn_overview_url');
-      let mdnOverviewTagsUrl = document.getElementById('mdn_overview_tags_url');
       let subTreeSelect = document.getElementById('url_sub_tree_select');
       let subTreeInput = document.getElementById('url_sub_tree');
       subTreeSelect.addEventListener('change', function (event) {
         subTreeInput.value = event.target.value;
         mdnOverviewUrl.href = subTreeInput.value + nameOfApi + "_API$edit";
-        mdnOverviewTagsUrl.href = mdnOverviewUrl + '#page-tags';
       });
       subTreeInput.addEventListener('input', function (event) {
         mdnOverviewUrl.href = subTreeInput.value + nameOfApi + "_API$edit";
-        mdnOverviewTagsUrl.href = mdnOverviewUrl + '#page-tags';
       });
-      // subTreeInput.addEventListener('change', function (event) {
-      //   mdnOverviewUrl.href = subTreeInput.value + nameOfApi + "_API$edit";
-      //   mdnOverviewTagsUrl.href = mdnOverviewUrl + '#page-tags';
-      // });
       mdnOverviewUrl.addEventListener('click', function (event) {
         event.preventDefault();
         let xhr = new XMLHttpRequest();
@@ -86,7 +79,7 @@
               case "OK": {
                 self.port.emit('request_skeleton2mdn', {
                   source: overviewSource.textContent,
-                  tags: overviewTags.value,
+                  tags: overviewPageTags,
                   url: event.target.href
                 });
                 break;
@@ -94,7 +87,7 @@
               case "NOT FOUND": {
                 self.port.emit('request_skeleton2mdn', {
                   source: overviewSource.textContent,
-                  tags: overviewTags.value,
+                  tags: overviewPageTags,
                   url: event.target.href.replace(/\$edit/, '')
                 });
                 break;
@@ -105,15 +98,15 @@
         };
         xhr.send();
       });
-      // subTreeSelect.select(1);
-      // subTreeSelect.select(0);
       subTreeSelect.selectedIndex = -1;
-      // subTreeSelect.selectedIndex = 1;
-      // if (subTreeSelect.selectedIndex != -1) {
-      //   subTreeInput.value = subTreeSelect.options[subTreeSelect.selectedIndex].value;
-      // }
       let overviewTags = document.getElementById('overview_tags');
-      overviewTags.value = "Overview, API, Reference, " + nameOfApi + " API";
+      let overviewPageTags = [
+        "Overview",
+        "API",
+        "Reference",
+        nameOfApi + " API"
+      ];
+      overviewTags.value = overviewPageTags.toString();
       overviewSource.style['display'] = 'none';
       let overviewToggle = document.getElementById('overview_toggle');
       overviewToggle.addEventListener('click', function (event) {
@@ -156,50 +149,27 @@
             Array.prototype.forEach.call(interfaceDefinitionList.querySelectorAll('.interface_name'), function (element) {
               element.parentElement.replaceChild(document.createTextNode(value.name), element);
             });
-            break;
-          }
-          case "menulist": {
-            let content2 = document.querySelector('template.' + value.type + '_item').content;
-            value.options.forEach(function (item) {
-              let syntaxUI2 = document.importNode(content2, "deep").firstElementChild;
-              syntaxUI2.textContent = item.label;
-              syntaxUI2.value = item.value;
-              if (data.prefs[value.name] == item.value) {
-                syntaxUI2.selected = true;
+            let interfacePage = document.querySelector('template.interface_page').content;
+            let interfacePageUI = document.importNode(interfacePage, "deep").firstElementChild;
+            document.body.appendChild(interfacePageUI);
+            value.members.forEach(function (member) {
+              switch (member.type) {
+                case "attribute": {
+                  if (member.readonly) {
+
+                  }
+                  if (member.idlType.idlType == 'EventHandler') {
+
+                  }
+                  else {
+
+                  }
+                  break;
+                }
+                case "operation": {
+                  break;
+                }
               }
-              element.appendChild(syntaxUI2);
-            });
-            element.name = value.name;
-            element.addEventListener('change', function(event) {
-              self.port.emit('save_setting', {
-                name: value.name,
-                value: event.target.value
-              });
-            });
-            break;
-          }
-          case "radio": {
-            let content2 = document.querySelector('template.' + value.type + '_item').content;
-            value.options.forEach(function (item) {
-              let syntaxUI2 = document.importNode(content2, "deep");
-              let radio = syntaxUI2.children[0];
-              let label = syntaxUI2.children[1];
-              radio.value = item.value;
-              radio.id = value.name + '.' + item.value;
-              radio.name = value.name;
-              label.textContent = item.label;
-              // O_Oh
-              label.htmlFor = value.name + '.' + item.value;
-              if (data.prefs[value.name] == radio.value) {
-                radio.checked = true;
-              }
-              element.appendChild(syntaxUI2);
-            });
-            element.addEventListener('change', function(event) {
-              self.port.emit('save_setting', {
-                name: value.name,
-                value: event.target.value
-              });
             });
             break;
           }

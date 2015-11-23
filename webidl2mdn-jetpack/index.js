@@ -11,39 +11,25 @@ let tree2URL =
 // to see how to test this function, look at test/test-index.js
 function dummy(text, callback) {
   tabs.on('ready', function (tab) {
-    // tab.close();
-    console.log('on ready', tab.index, tab.title, tab.readyState, tabs.length);
-    // for (let tab of tabs) {
-    //   console.log(tab.title, tab.readyState);
-    // }
-    // if (tabs.length == 2) {
-    //   tabs[tabs.length - 1].close();
-    // }
-    // tabs.activeTab.close();
+    DEBUG_ADDON && console.log('on ready', tab.index, tab.title, tab.readyState, tabs.length);
   });
   tabs.on('activate', function (tab) {
-    console.log('on activate', tab.index, tab.title, tab.readyState, tabs.length);
-    // if (tabs.length == 2) {
-    //   tabs[tabs.length - 1].close();
-    // }
-    // tabs.activeTab.close();
+    DEBUG_ADDON && console.log('on activate', tab.index, tab.title, tab.readyState, tabs.length);
   });
   tabs.on('load', function (tab) {
-    console.log('on load', tab.index, tab.title, tab.readyState, tabs.length);
+    DEBUG_ADDON && console.log('on load', tab.index, tab.title, tab.readyState, tabs.length);
     if (tab.index == 1 && tab.readyState == 'complete') {
+      // The skeleton page load is complete, so we can close what would be
+      // an unexpected tab for the test suite.
       tabs[tab.index].close();
+      // Finally run a simple parse without opening tabs and terminate
+      // by calling callback(text) as expected by test suite.
       main({text: text, callback: callback});
     }
-    // tabs.activeTab.close();
   });
+  // Test loading a passinng reference .webidl file
+  // This should open a second tab with the skeleton (current only an overview page)
   tabs.activeTab.url = tree2URL;
-  // tabs.open({
-  //   // inNewWindow: true,
-  //   url: tree2URL,
-  //   onReady: function (tab) {
-  //     tab.close();
-  //   }
-  // });
 }
 
 exports.dummy = dummy;
@@ -51,12 +37,6 @@ exports.dummy = dummy;
 function main(options) {
   let tree = WebIDL2.parse("dictionary InstallParameters {\n sequence<DOMString> receipts = [];\n sequence<DOMString> categories = [];\n};");
   DEBUG_ADDON && console.log(JSON.stringify(tree, null, 2));
-  // 'https://gist.githubusercontent.com/anaran/d08cf8ccd082e81cf72a/raw/9e0a50d547065bda8085aca4df835e8f07f76400/Apps.webidl';
-  // 'https://gist.githubusercontent.com/anaran/d08cf8ccd082e81cf72a/raw/165d8bf251575cba1fe8412554b0b1d9d3488ce8/Apps.webidl';
-  // 'https://gist.githubusercontent.com/anaran/d08cf8ccd082e81cf72a/raw/45712598504d8030d42b7c86dd4eed4593c0d7b6/Apps.webidl';
-  // 'https://gist.githubusercontent.com/anaran/d08cf8ccd082e81cf72a/raw/61e8306fb27351a07e1e51d820ccdec47e4c0b1f/Apps.webidl';
-  // 'https://gist.githubusercontent.com/anaran/d08cf8ccd082e81cf72a/raw/0a821d937303c732ec2efdf85e207a4f046774d1/Apps.webidl';
-  // 'http://mxr.mozilla.org/mozilla-central/source/dom/webidl/Apps.webidl?raw=1';
   xhr.open('GET', options.url || tree2URL);
   xhr.onload = options.onload || function() {
     if (this.readyState == xhr.DONE && xhr.responseText.length) {
@@ -84,6 +64,7 @@ let handleErrors = function (exception) {
   // post error data to it.
   DEBUG_ADDON && console.log((JSON.stringify(exception,
                                              Object.getOwnPropertyNames(exception), 2)));
+  // Opening a new tab open raises yet another error to handle ...
   return;
   let originallyActiveTab = tabs.activeTab;
   tabs.open({
@@ -129,8 +110,8 @@ tabs.on('load', function(tab) {
           main({url: originallyActiveTab.url, onload: function () {
             if (this.readyState == xhr.DONE && xhr.responseText.length) {
               DEBUG_ADDON && console.log('xhr.responseText', xhr.responseText);
+              let package = require('./package.json');
               try {
-                let package = require('./package.json');
                 let tree2 = WebIDL2.parse(xhr.responseText);
                 DEBUG_ADDON && console.log(JSON.stringify(tree2, null, 2));
                 webidl2mdnWorker.port.emit('load_webidl2mdn', {
@@ -141,6 +122,12 @@ tabs.on('load', function(tab) {
                 });
               }
               catch (e) {
+                webidl2mdnWorker.port.emit('load_webidl2mdn', {
+                  generator: package.title,
+                  icon: package.icon,
+                  url: originallyActiveTab.url,
+                  exception: e
+                });
                 DEBUG_ADDON && console.log('exception', JSON.stringify(e, Object.keys(e), 2), e.toString());
               }
             }
