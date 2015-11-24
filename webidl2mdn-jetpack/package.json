@@ -13,6 +13,7 @@
     "firefox": ">=38.0a1",
     "fennec": ">=38.0a1"
   },
+  "homepage": "https://github.com/anaran/webidl2mdn-jetpack",
   "icon": "resource://webidl2mdn-jetpack-at-addons-dot-mozilla-dot-org/data/posts-48.png",
   "license": "MIT",
   "keywords": [

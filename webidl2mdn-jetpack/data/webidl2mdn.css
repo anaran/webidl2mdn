@@ -12,7 +12,7 @@ pre.source {
   text-overflow: ellipsis ellipsis;
 }
 
-div.overview section.content {
+section.content {
   overflow: hidden;
   height: 3rem;
 }

@@ -12,6 +12,52 @@
 // let sp = require('sdk/simple-prefs');
 (function() {
   let DEBUG_ADDON = false;
+  function setupMdnButton(options) {
+    if (options.button &&
+        options.path &&
+        options.destination &&
+        options.source &&
+        options.tags) {
+      options.button.value = 'Create/add to ' + options.path + ' page on MDN';
+      options.button.setAttribute('data-path', options.path);
+      options.button.addEventListener('click', function (event) {
+        // event.preventDefault();
+        if (options.destination && options.destination.value.length > 0 &&
+            options.destination.validity.valid && this.dataset['path']) {
+          let url = document.baseURI + options.destination.value + this.dataset['path'] + '$edit';
+          let xhr = new XMLHttpRequest();
+          xhr.open('GET', url);
+          xhr.onload = function () {
+            if (this.readyState == xhr.DONE) {
+              switch (this.statusText) {
+                case "OK": {
+                  self.port.emit('request_skeleton2mdn', {
+                    source: options.source.textContent,
+                    tags: options.tags,
+                    url: url
+                  });
+                  break;
+                }
+                case "NOT FOUND": {
+                  self.port.emit('request_skeleton2mdn', {
+                    source: options.source.textContent,
+                    tags: options.tags,
+                    url: this.responseURL.replace(/\$edit/, '')
+                  });
+                  break;
+                }
+              }
+              DEBUG_ADDON && console.log('xhr.responseText', xhr.responseText);
+            }
+          };
+          xhr.send();
+        }
+        else {
+          options.destination.scrollIntoView();
+        }
+      });
+    }
+  }
   function setupOverflowEditDiv(options) {
     options.div &&
       options.edit &&
@@ -101,22 +147,6 @@
         source: applicationDescription,
         div: document.body.querySelector('.toggles'),
       });
-      // applicationDescriptionToggle.addEventListener('click', function (event) {
-      //   if (applicationDescription.style['white-space'] != 'pre') {
-      //     applicationDescription.style['white-space'] = 'pre';
-      //     applicationDescriptionToggle.innerHTML = '&blacktriangledown;';
-      //     applicationDescriptionToggle.style['position'] = 'fixed';
-      //   }
-      //   else {
-      //     applicationDescription.style['white-space'] = 'nowrap';
-      //     applicationDescriptionToggle.innerHTML = '&blacktriangleright;';
-      //     applicationDescriptionToggle.style['position'] = 'relative';
-      //     let y = applicationDescriptionToggle.getBoundingClientRect().y;
-      //     if (y < 0) {
-      //       applicationDescriptionToggle.scrollIntoView();
-      //     }
-      //   }
-      // });
       // SEE ALSO Pages
       // https://developer.mozilla.org/en-US/docs/Template:GroupData
       // described in
@@ -124,6 +154,12 @@
       //
       // OVERVIEW Pages
       // See https://developer.mozilla.org/en-US/docs/MDN/Contribute/Howto/Write_an_API_reference#Structure_of_an_overview_page
+      let productionNode = document.importNode(
+        document.querySelector('template.production').content,
+        "deep");
+      productionNode.firstElementChild.href = data.homepage;
+      productionNode.firstElementChild.textContent = data.generator;
+      productionNode.lastElementChild.textContent = ' from ' + data.url;
       let overview = document.querySelector('template.overview').content;
       let overviewUI = document.importNode(overview, "deep").firstElementChild;
       document.body.appendChild(overviewUI);
@@ -135,57 +171,14 @@
       overviewInterfacesHeadline.textContent = nameOfApi + ' Interfaces';
       let overviewSource = overviewUI.querySelector('.source');
       let overviewContent = overviewUI.querySelector('.content');
-      let mdnOverviewUrl = overviewUI.querySelector('.mdn_overview_url');
-      let subTreeSelect = document.body.querySelector('#url_sub_tree_select');
-      let subTreeInput = document.body.querySelector('#url_sub_tree');
-      subTreeSelect.addEventListener('change', function (event) {
-        subTreeInput.value = event.target.value;
-        mdnOverviewUrl.href = subTreeInput.value + nameOfApi + "_API$edit";
-        mdnOverviewUrl.disabled = false;
-      });
-      subTreeInput.addEventListener('input', function (event) {
-        mdnOverviewUrl.href = subTreeInput.value + nameOfApi + "_API$edit";
-        mdnOverviewUrl.disabled = false;
-      });
-      mdnOverviewUrl.addEventListener('click', function (event) {
-        event.preventDefault();
-        let xhr = new XMLHttpRequest();
-        xhr.open('GET', event.target.href);
-        xhr.onload = function () {
-          if (this.readyState == xhr.DONE) {
-            switch (this.statusText) {
-              case "OK": {
-                self.port.emit('request_skeleton2mdn', {
-                  source: overviewSource.textContent,
-                  tags: overviewPageTags,
-                  url: event.target.href
-                });
-                break;
-              }
-              case "NOT FOUND": {
-                self.port.emit('request_skeleton2mdn', {
-                  source: overviewSource.textContent,
-                  tags: overviewPageTags,
-                  url: event.target.href.replace(/\$edit/, '')
-                });
-                break;
-              }
-            }
-            DEBUG_ADDON && console.log('xhr.responseText', xhr.responseText);
-          }
-        };
-        xhr.send();
-      });
-      subTreeSelect.selectedIndex = -1;
-      mdnOverviewUrl.disabled = true;
-      let overviewTags = overviewUI.querySelector('div.overview input.tags');
+      let overviewPageTagsUI = overviewUI.querySelector('div.overview input.tags');
       let overviewPageTags = [
         "Overview",
         "API",
         "Reference",
         nameOfApi + " API"
       ];
-      overviewTags.value = overviewPageTags.toString();
+      overviewPageTagsUI.value = overviewPageTags.toString();
       overviewSource.style['display'] = 'none';
       let overviewEditToggle = overviewUI.querySelector('.edit_toggle');
       let overviewToggleDiv = overviewUI.querySelector('.toggles');
@@ -197,11 +190,28 @@
         source: overviewSource,
         content: overviewContent
       });
+      let subTreeSelect = document.body.querySelector('#url_sub_tree_select');
+      let subTreeInput = document.body.querySelector('#url_sub_tree');
+      subTreeSelect.addEventListener('change', function (event) {
+        subTreeInput.value = event.target.value;
+      });
+      subTreeInput.addEventListener('input', function (event) {
+      });
+      subTreeSelect.selectedIndex = -1;
+      setupMdnButton({
+        button: overviewUI.querySelector('.mdn_overview_url'),
+        path: nameOfApi + '_API',
+        destination: subTreeInput,
+        source: overviewSource,
+        tags: overviewPageTags 
+      });
       Array.prototype.forEach.call(overviewContent.querySelectorAll('span.api_name'), function (element) {
         element.parentElement.replaceChild(document.createTextNode(nameOfApi), element);
       });
+      document.createComment
       Array.prototype.forEach.call(overviewContent.querySelectorAll('span.generator_name'), function (element) {
-        element.parentElement.replaceChild(document.createTextNode(data.generator + ' from ' + data.url), element);
+        // element.parentElement.replaceChild(document.createTextNode(data.generator + ' from ' + data.url), element);
+        element.parentElement.replaceChild(productionNode, element);
       });
       // See https://developer.mozilla.org/en-US/docs/MDN/Contribute/Howto/Write_an_API_reference
       let interfaceDefinitionList = overviewContent.querySelector('#interface_definitions');
@@ -228,6 +238,92 @@
             let interfacePage = document.querySelector('template.interface_page').content;
             let interfacePageUI = document.importNode(interfacePage, "deep").firstElementChild;
             document.body.appendChild(interfacePageUI);
+            let interfacePageSource = interfacePageUI.querySelector('.source');
+            let interfacePageContent = interfacePageUI.querySelector('.content');
+
+
+            let interfacePageTagsUI = interfacePageUI.querySelector('div.interface_page input.tags');
+            let interfacePageTags = [
+              "Interface",
+              "API",
+              "Reference",
+              nameOfApi + " API",
+              value.name
+            ];
+            interfacePageTagsUI.value = interfacePageTags.toString();
+            interfacePageSource.style['display'] = 'none';
+            let interfacePageEditToggle = interfacePageUI.querySelector('.edit_toggle');
+            let interfacePageToggleDiv = interfacePageUI.querySelector('.toggles');
+            let interfacePageOverflowToggle = interfacePageUI.querySelector('.overflow_toggle');
+            setupOverflowEditDiv({
+              edit: interfacePageEditToggle,
+              overflow: interfacePageOverflowToggle,
+              div: interfacePageToggleDiv,
+              source: interfacePageSource,
+              content: interfacePageContent
+            });
+            setupMdnButton({
+              button: interfacePageUI.querySelector('.mdn_overview_url'),
+              path: value.name,
+              destination: subTreeInput,
+              source: interfacePageSource,
+              tags: interfacePageTags 
+            });
+            Array.prototype.forEach.call(interfacePageContent.querySelectorAll('span.api_name'), function (element) {
+              element.parentElement.replaceChild(document.createTextNode(nameOfApi), element);
+            });
+            Array.prototype.forEach.call(interfacePageContent.querySelectorAll('span.interface_name'), function (element) {
+              element.parentElement.replaceChild(document.createTextNode(value.name), element);
+            });
+            Array.prototype.forEach.call(interfacePageContent.querySelectorAll('span.generator_name'), function (element) {
+              // element.parentElement.replaceChild(document.createTextNode(data.generator + ' from ' + data.url), element);
+              element.parentElement.replaceChild(productionNode, element);
+            });
+
+
+
+
+
+
+
+
+            let properties = interfacePageContent.querySelector('#property_definitions');
+            let methods = interfacePageContent.querySelector('#method_definitions');
+            let methodsObsolete = interfacePageContent.querySelector('#method_definitions_obsolete');
+            if (value.inheritance) {
+              console.log('.methods.but_inherits', interfacePageContent.querySelector('.methods.but_inherits'));
+              let domRefList = value.inheritance.toString().split(/,/).map(function (domRef) {
+                return '{{domxref("' + domRef + '")}}';
+              }).toString();
+              console.log('domRefList', domRefList);
+              if (value.members.length > 0) {
+                Array.prototype.forEach.call(
+                  interfacePageContent.querySelectorAll('.methods.also_inherits span.domref_list'),
+                  function (element) {
+                    element.parentElement.replaceChild(document.createTextNode(
+                      domRefList
+                    ), element);
+                  });
+                interfacePageContent.querySelector('.methods.but_inherits').style['display'] = 'none';
+              }
+              else {
+                Array.prototype.forEach.call(
+                  interfacePageContent.querySelectorAll('.methods.but_inherits span.domref_list'),
+                  function (element) {
+                    element.parentElement.replaceChild(document.createTextNode(
+                      domRefList
+                    ), element);
+                  });
+                interfacePageContent.querySelector('.methods.also_inherits').style['display'] = 'none';
+              }
+            }
+            else {
+              console.log('.methods.but_inherits', interfacePageContent.querySelector('.methods.but_inherits'));
+              interfacePageContent.querySelector('.methods.but_inherits').style['display'] = 'none';
+              interfacePageContent.querySelector('.methods.also_inherits').style['display'] = 'none';
+              interfacePageContent.querySelector('.properties.but_inherits').style['display'] = 'none';
+              interfacePageContent.querySelector('.properties.also_inherits').style['display'] = 'none';
+            }
             value.members.forEach(function (member) {
               switch (member.type) {
                 case "attribute": {
@@ -243,10 +339,16 @@
                   break;
                 }
                 case "operation": {
+                  let methodUI = document.importNode(interfaceDefinition, "deep");
+                  methods.appendChild(methodUI);
+                  Array.prototype.forEach.call(methods.querySelectorAll('.interface_name'), function (element) {
+                    element.parentElement.replaceChild(document.createTextNode(value.name + '.' + member.name + '()'), element);
+                  });
                   break;
                 }
               }
             });
+            interfacePageSource.textContent = interfacePageContent.innerHTML;
             break;
           }
         }
@@ -255,7 +357,8 @@
       overviewSource.textContent = overviewContent.innerHTML;
     }
     catch (e) {
-      DEBUG_ADDON && console.log('exception', JSON.stringify(e, Object.keys(e), 2), e.toString());
+      // console.exception(e);
+      console.log('exception', JSON.stringify(e, Object.keys(e), 2), e.toString());
     }
   });
   // self is undefined when using require in jpm test.

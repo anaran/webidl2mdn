@@ -59,13 +59,14 @@ function main(options) {
   xhr.send();
 }
 
-let handleErrors = function (exception) {
+let reportErrors = function (exception) {
   // FIXME: Perhaps this should open a styled error page and just
   // post error data to it.
-  DEBUG_ADDON && console.log((JSON.stringify(exception,
+  // NOTE always report error!
+  console.error((JSON.stringify(exception,
                                              Object.getOwnPropertyNames(exception), 2)));
   // Opening a new tab open raises yet another error to handle ...
-  return;
+  // return;
   let originallyActiveTab = tabs.activeTab;
   tabs.open({
     // inNewWindow: true,
@@ -104,29 +105,30 @@ tabs.on('load', function(tab) {
             // './report-json-parse-error.js',
             // './diagnostics_overlay.js'
           ],
-          onError: handleErrors
+          onError: reportErrors
         });
         let emitLoadwebidl2mdn = function (data) {
           main({url: originallyActiveTab.url, onload: function () {
             if (this.readyState == xhr.DONE && xhr.responseText.length) {
               DEBUG_ADDON && console.log('xhr.responseText', xhr.responseText);
-              let package = require('./package.json');
+              let packageJson = require('./package.json');
               try {
                 let tree2 = WebIDL2.parse(xhr.responseText);
                 DEBUG_ADDON && console.log(JSON.stringify(tree2, null, 2));
                 webidl2mdnWorker.port.emit('load_webidl2mdn', {
-                  generator: package.title,
-                  icon: package.icon,
-                  title: package.title,
+                  generator: packageJson.title,
+                  icon: packageJson.icon,
+                  homepage: packageJson.homepage,
+                  title: packageJson.title,
                   url: originallyActiveTab.url,
                   AST: tree2
                 });
               }
               catch (e) {
                 webidl2mdnWorker.port.emit('load_webidl2mdn', {
-                  generator: package.title,
-                  icon: package.icon,
-                  title: package.title,
+                  generator: packageJson.title,
+                  icon: packageJson.icon,
+                  title: packageJson.title,
                   url: originallyActiveTab.url,
                   exception: e
                 });
@@ -146,7 +148,7 @@ tabs.on('load', function(tab) {
                 contentScriptFile: [
                   './skeleton2mdn.js',
                 ],
-                onError: handleErrors
+                onError: reportErrors
               });
               let emitEditMdn = function () {
                 skeletonMdnTabWorker.port.emit('load_editMdn', {
