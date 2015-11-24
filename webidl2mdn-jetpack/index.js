@@ -6,6 +6,7 @@ let xhr = new XMLHttpRequest();
 let WebIDL2 = require("webidl2");
 let tree2URL = 
     'https://gist.githubusercontent.com/anaran/d08cf8ccd082e81cf72a/raw/1c3e06eaf70562bd2db80c056d5aaef6b18208c4/Apps.webidl';
+let packageJson = require('./package.json');
 
 // a dummy function, to show how tests work.
 // to see how to test this function, look at test/test-index.js
@@ -64,7 +65,7 @@ let reportErrors = function (exception) {
   // post error data to it.
   // NOTE always report error!
   console.error((JSON.stringify(exception,
-                                             Object.getOwnPropertyNames(exception), 2)));
+                                Object.getOwnPropertyNames(exception), 2)));
   // Opening a new tab open raises yet another error to handle ...
   // return;
   let originallyActiveTab = tabs.activeTab;
@@ -111,7 +112,6 @@ tabs.on('load', function(tab) {
           main({url: originallyActiveTab.url, onload: function () {
             if (this.readyState == xhr.DONE && xhr.responseText.length) {
               DEBUG_ADDON && console.log('xhr.responseText', xhr.responseText);
-              let packageJson = require('./package.json');
               try {
                 let tree2 = WebIDL2.parse(xhr.responseText);
                 DEBUG_ADDON && console.log(JSON.stringify(tree2, null, 2));
@@ -170,6 +170,27 @@ tabs.on('load', function(tab) {
               }
             }});
         };
+        webidl2mdnWorker.port.on('notification', function (data) {
+          let notifications = require('sdk/notifications');
+          let qs = require("sdk/querystring");
+          notifications.notify({
+            title: packageJson.title,
+            text: data.text,
+            data: qs.stringify({
+              title:
+              packageJson.title + ' in ' + self.version,
+              body:
+              data.text + "\n"
+            }),
+            onClick: function (data) {
+              tabs.open({
+                inNewWindow: true,
+                url: packageJson.homepage + '/issues/new?' + data,
+                onClose: function() {
+                  tabs.activeTab.activate();
+                }});
+            }});
+        });
         webidl2mdnWorker.port.on('request_webidl2mdn', emitLoadwebidl2mdn);
         webidl2mdnWorker.port.on('request_skeleton2mdn', emitLoadSkeleton2Mdn);
       },

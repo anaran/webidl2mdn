@@ -54,6 +54,8 @@
         }
         else {
           options.destination.scrollIntoView();
+          options.destination.focus();
+          self.port.emit('notification', { text: "I would like to report I don't like this notification." });
         }
       });
     }
@@ -84,10 +86,10 @@
         options.content.style['display'] = 'none';
         options.edit.style['opacity'] = 0.5;
         options.overflow.style['visibility'] = 'hidden';
-        options.div.scrollIntoView();
+        // options.div.scrollIntoView();
         options.div.style['position'] = 'fixed';
-        options.div.style['top'] = 0;
-        // options.div.style['top'] = bcr.top + 'px';
+        // options.div.style['top'] = 0;
+        options.div.style['top'] = bcr.top + 'px';
       }
     });
     options.div &&
@@ -115,10 +117,10 @@
         options.source && (options.source.style['white-space'] = 'pre');
         options.overflow.innerHTML = '&blacktriangledown;';
         options.edit && (options.edit.style['visibility'] = 'visible');
-        options.div.scrollIntoView();
+        // options.div.scrollIntoView();
         options.div.style['position'] = 'fixed';
-        options.div.style['top'] = 0;
-        // options.div.style['top'] = bcr.top + 'px';
+        // options.div.style['top'] = 0;
+        options.div.style['top'] = bcr.top + 'px';
       }
     });
   }
@@ -205,11 +207,11 @@
         source: overviewSource,
         tags: overviewPageTags 
       });
-      Array.prototype.forEach.call(overviewContent.querySelectorAll('span.api_name'), function (element) {
+      Array.prototype.forEach.call(overviewUI.querySelectorAll('span.api_name'), function (element) {
         element.parentElement.replaceChild(document.createTextNode(nameOfApi), element);
       });
       document.createComment
-      Array.prototype.forEach.call(overviewContent.querySelectorAll('span.generator_name'), function (element) {
+      Array.prototype.forEach.call(overviewUI.querySelectorAll('span.generator_name'), function (element) {
         // element.parentElement.replaceChild(document.createTextNode(data.generator + ' from ' + data.url), element);
         element.parentElement.replaceChild(productionNode, element);
       });
@@ -269,25 +271,24 @@
               source: interfacePageSource,
               tags: interfacePageTags 
             });
-            Array.prototype.forEach.call(interfacePageContent.querySelectorAll('span.api_name'), function (element) {
+            Array.prototype.forEach.call(interfacePageUI.querySelectorAll('span.api_name'), function (element) {
               element.parentElement.replaceChild(document.createTextNode(nameOfApi), element);
             });
-            Array.prototype.forEach.call(interfacePageContent.querySelectorAll('span.interface_name'), function (element) {
+            Array.prototype.forEach.call(interfacePageUI.querySelectorAll('span.interface_name'), function (element) {
               element.parentElement.replaceChild(document.createTextNode(value.name), element);
             });
+            let productionNode = document.importNode(
+              document.querySelector('template.production').content,
+              "deep");
+            productionNode.firstElementChild.href = data.homepage;
+            productionNode.firstElementChild.textContent = data.generator;
+            productionNode.lastElementChild.textContent = ' from ' + data.url;
             Array.prototype.forEach.call(interfacePageContent.querySelectorAll('span.generator_name'), function (element) {
               // element.parentElement.replaceChild(document.createTextNode(data.generator + ' from ' + data.url), element);
               element.parentElement.replaceChild(productionNode, element);
             });
-
-
-
-
-
-
-
-
             let properties = interfacePageContent.querySelector('#property_definitions');
+            let eventHandlerProperties = interfacePageContent.querySelector('#event_handler_property_definitions');
             let methods = interfacePageContent.querySelector('#method_definitions');
             let methodsObsolete = interfacePageContent.querySelector('#method_definitions_obsolete');
             if (value.inheritance) {
@@ -296,7 +297,12 @@
                 return '{{domxref("' + domRef + '")}}';
               }).toString();
               console.log('domRefList', domRefList);
-              if (value.members.length > 0) {
+              // method == webidl operation
+              if (value.members.some(function (member) {
+                if (member.type == 'operation') {
+                  return true;
+                }
+              })) {
                 Array.prototype.forEach.call(
                   interfacePageContent.querySelectorAll('.methods.also_inherits span.domref_list'),
                   function (element) {
@@ -316,6 +322,31 @@
                   });
                 interfacePageContent.querySelector('.methods.also_inherits').style['display'] = 'none';
               }
+              // property == webidl attribute
+              if (value.members.some(function (member) {
+                if (member.type == 'attribute') {
+                  return true;
+                }
+              })) {
+                Array.prototype.forEach.call(
+                  interfacePageContent.querySelectorAll('.properties.also_inherits span.domref_list'),
+                  function (element) {
+                    element.parentElement.replaceChild(document.createTextNode(
+                      domRefList
+                    ), element);
+                  });
+                interfacePageContent.querySelector('.properties.but_inherits').style['display'] = 'none';
+              }
+              else {
+                Array.prototype.forEach.call(
+                  interfacePageContent.querySelectorAll('.properties.but_inherits span.domref_list'),
+                  function (element) {
+                    element.parentElement.replaceChild(document.createTextNode(
+                      domRefList
+                    ), element);
+                  });
+                interfacePageContent.querySelector('.properties.also_inherits').style['display'] = 'none';
+              }
             }
             else {
               console.log('.methods.but_inherits', interfacePageContent.querySelector('.methods.but_inherits'));
@@ -327,14 +358,34 @@
             value.members.forEach(function (member) {
               switch (member.type) {
                 case "attribute": {
+                  let propertyUI = document.importNode(interfaceDefinition, "deep");
+                  Array.prototype.forEach.call(propertyUI.querySelectorAll('.interface_name'), function (element) {
+                    element.parentElement.replaceChild(document.createTextNode(value.name + '.' + member.name), element)
+                  });
                   if (member.readonly) {
-
+                    propertyUI.firstElementChild.textContent += '{{readonlyInline}}';
+                  }
+                  if (member.extAttrs.some(function (attr) {
+                    if (attr.name == 'CheckAnyPermissions' &&
+                        attr.rhs && 
+                        attr.rhs.value &&
+                        // FIXME: modified value used to make
+                        // "webidl2": "2.0.11" parse
+                        // https://gist.githubusercontent.com/anaran/d08cf8ccd082e81cf72a/raw/1c3e06eaf70562bd2db80c056d5aaef6b18208c4/Apps.webidl
+                        attr.rhs.value == 'webapps_manage') {
+                      return true;
+                    }
+                  })) {
+                    propertyUI.firstElementChild.textContent += '{{B2GOnlyHeader2("certified")}}';
                   }
                   if (member.idlType.idlType == 'EventHandler') {
-
+                    eventHandlerProperties.appendChild(propertyUI);
                   }
                   else {
-
+                    properties.appendChild(propertyUI);
+                    // Array.prototype.forEach.call(properties.querySelectorAll('.interface_name'), function (element) {
+                    //   element.parentElement.replaceChild(document.createTextNode(value.name + '.' + member.name + '()'), element);
+                    // });
                   }
                   break;
                 }

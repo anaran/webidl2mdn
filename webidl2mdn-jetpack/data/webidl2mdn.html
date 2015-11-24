@@ -37,11 +37,11 @@
     <!-- https://developer.mozilla.org/en-US/docs/MDN/Contribute/Howto/Write_an_API_reference#Structure_of_an_overview_page -->
     <template class="overview">
       <div class="overview">
-        <h2>Overview page tags</h2>
+        <h2><span class="api_name">API_NAME</span> overview page</h2>
+        <input class="mdn_overview_url" type="button"/>
         <p>Following tags will be added to existing tags.</strong></p>
     <input class="tags" readonly size="80" class="tags" type="text"/>
     <p>Review HTML/source code below to see what will be added before existing content.</p>
-    <input class="mdn_overview_url" type="button"/> 
     <div class="toggles">
       <span title="toogle to view full content" class="overflow_toggle">&blacktriangleright;</span>
       <span title="toogle to copy to MDN (edit at own risk)" class="edit_toggle">&checkmark;</span>
@@ -158,11 +158,11 @@
 </template>
 <template class="interface_page">
   <div class="interface_page">
-    <h2>Interface page tags</h2>
+    <h2><span class="interface_name">INTERFACE_NAME</span> interface page</h2>
+    <input class="mdn_overview_url" type="button"/>
     <p>Following tags will be added to the tags fields when you <strong>Create/add to interface page on MDN.</strong></p>
     <input class="tags" readonly size="80" class="tags" type="text"/>
     <p>Review HTML/source code below to see what will be added before existing content.</p>
-    <input class="mdn_overview_url" type="button"/> 
     <div class="toggles">
       <span title="toogle to view full content" class="overflow_toggle">&blacktriangleright;</span>
       <span title="toogle to copy to MDN (edit at own risk)" class="edit_toggle">&checkmark;</span>
@@ -180,6 +180,9 @@
       <p class="properties but_inherits"><em>This interface doesn't implement any specific property, but inherits properties from <span class="properties domref_list">domref_list</span>.</em></p>
       <p class="properties also_inherits"><em>This interface also inherits properties from <span class="properties domref_list">domref_list</span>.</em></p>
       <dl id="property_definitions">
+      </dl>
+      <h3 id="event_handler_properties">Event handlers</h3>
+      <dl id="event_handler_property_definitions">
       </dl>
       <h2 id="methods" name="methods">Methods</h2>
       <p class="methods but_inherits"><em>This interface doesn't implement any specific method, but inherits methods from <span class="methods domref_list">domref_list</span>.</em></p>
