@@ -1,2 +1,2 @@
-#WebIDL to MDN Skeleton Converter
-WebIDL to MDN Skeleton Converter
+#MDN Web API Referee
+MDN Web API Referee
