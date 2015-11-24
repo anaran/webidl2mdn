@@ -13,12 +13,11 @@
   <body role="application">
     <h1 id="title" data-l10n-id="title">Webidl to MDN Docs</h1>
     <div id="production">production note</div>
-    <span id="application_description_toggle">&blacktriangleright;</span>
+    <div class="toggles">
+      <span id="application_description_toggle">&blacktriangleright;</span>
+    </div>
     <pre class="info" id="application_description" data-l10n-id="addon_description">DESCRIPTION</pre>
-    <h2>Overview page tags</h2>
-    <p>Following tags will be added to the tags fields when you <strong>Create/add to overview page on MDN.</strong></p>
-    <input id="overview_tags" readonly size="80" class="tags" type="text"/>
-    <h2>Overview page destination</h2>
+    <h2>MDN Web API destination</h2>
     <p>Select or type a relative path to where under MDN you want to put the generated content.</p>
     <select id="url_sub_tree_select">
       <option selected value="en-US/docs/Web/API/">Official Web API location</option>
@@ -26,21 +25,6 @@
       <option value="en-US/docs/Inbox/User:maybe/webidl_mdn/">Developer test location (use your own please)</option>
     </select>
     <input id="url_sub_tree" pattern="((-|:|\w)+/)+$" size="80" type="text"/>
-    <!-- Taken from https://developer.mozilla.org/en-US/Add-ons/SDK/High-Level_APIs/simple-prefs -->
-    <!-- tt = document.querySelectorAll('h4#Preference_Types~table.standard-table tr') -->
-    <!-- Array.prototype.forEach.call(tt, function(v, i, obj) { console.log(v.firstElementChild.textContent); }); -->
-    <!-- undefined -->
-    <!-- Type -->
-    <!-- bool -->
-    <!-- boolint -->
-    <!-- integer -->
-    <!-- string -->
-    <!-- color -->
-    <!-- file -->
-    <!-- directory -->
-    <!-- menulist -->
-    <!-- radio -->
-    <!-- control -->
     <template class="links">
       <div class="links settings"></div>
     </template>
@@ -50,11 +34,14 @@
     <!-- https://developer.mozilla.org/en-US/docs/MDN/Contribute/Howto/Write_an_API_reference#Structure_of_an_overview_page -->
     <template class="overview">
       <div class="overview">
+        <h2>Overview page tags</h2>
+        <p>Following tags will be added to the tags fields when you <strong>Create/add to overview page on MDN.</strong></p>
+        <input class="tags" readonly size="80" class="tags" type="text"/>
         <p><a class="mdn_overview_url" href>Create/add to overview page on MDN</a>. Review HTML/source code below to see what will be added before existing content.</p>
         <div class="toggles">
           <span title="toogle to view full content" class="overflow_toggle">&blacktriangleright;</span>
-          <span hidden title="toogle to copy to MDN (edit at own risk)" class="edit_toggle">&checkmark;</span>
-<!--           <span title="toogle to copy to MDN (edit at own risk)" class="edit_toggle">&PlusMinus;</span> -->
+          <span title="toogle to copy to MDN (edit at own risk)" class="edit_toggle">&checkmark;</span>
+          <!--           <span title="toogle to copy to MDN (edit at own risk)" class="edit_toggle">&PlusMinus;</span> -->
         </div>
         <pre contenteditable class="source"></pre>
         <section class="content">

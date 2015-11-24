@@ -12,7 +12,70 @@
 // let sp = require('sdk/simple-prefs');
 (function() {
   let DEBUG_ADDON = false;
-
+  function setupOverflowEditDiv(options) {
+    options.div &&
+      options.edit &&
+      options.source &&
+      options.content &&
+      options.edit.addEventListener('click', function (event) {
+      let bcr = options.div && options.div.getBoundingClientRect();
+      if (options.source.style['display'] != 'none') {
+        options.content.innerHTML = options.source.textContent;
+        window.requestAnimationFrame(function(domHighResTimeStamp) {
+          options.source.style['display'] = 'none';
+          options.content.style['display'] = 'block';
+          options.edit.style['opacity'] = 1.0;
+          options.overflow.style['visibility'] = 'visible';
+          options.div.style['position'] = 'relative';
+          options.div.scrollIntoView();
+          // options.div.style['top'] = 0;
+          if (bcr && bcr.y < 0) {
+          }
+        });
+      }
+      else {
+        options.source.style['display'] = 'block';
+        options.content.style['display'] = 'none';
+        options.edit.style['opacity'] = 0.5;
+        options.overflow.style['visibility'] = 'hidden';
+        options.div.scrollIntoView();
+        options.div.style['position'] = 'fixed';
+        options.div.style['top'] = 0;
+        // options.div.style['top'] = bcr.top + 'px';
+      }
+    });
+    options.div &&
+      options.overflow &&
+      options.overflow.addEventListener('click', function (event) {
+      let bcr = options.div && options.div.getBoundingClientRect();
+      if (options.content &&
+          options.content.style['height'] == '100%' ||
+          options.source &&
+          options.source.style['white-space'] == 'pre') {
+        window.requestAnimationFrame(function(domHighResTimeStamp) {
+          options.content && (options.content.style['height'] = '3rem');
+          options.source && (options.source.style['white-space'] = 'nowrap');
+          options.overflow.innerHTML = '&blacktriangleright;';
+          options.edit && (options.edit.style['visibility'] = 'hidden');
+          options.div.style['position'] = 'relative';
+          options.div.scrollIntoView();
+          // options.div.style['top'] = 0;
+          if (bcr && bcr.y < 0) {
+          }
+        });
+      }
+      else {
+        options.content && (options.content.style['height'] = '100%');
+        options.source && (options.source.style['white-space'] = 'pre');
+        options.overflow.innerHTML = '&blacktriangledown;';
+        options.edit && (options.edit.style['visibility'] = 'visible');
+        options.div.scrollIntoView();
+        options.div.style['position'] = 'fixed';
+        options.div.style['top'] = 0;
+        // options.div.style['top'] = bcr.top + 'px';
+      }
+    });
+  }
   let tryConvertToJson = function(text) {
     let json = text.replace(/^\s*\/\/.+\n/gm, '');
     json = json.replace(/'([^']*)'/g, '"$1"');
@@ -33,22 +96,27 @@
       //   document.body.removeChild(setting);
       // });
       applicationDescription.textContent = JSON.stringify(data, null, 2);
-      applicationDescriptionToggle.addEventListener('click', function (event) {
-        if (applicationDescription.style['white-space'] != 'pre') {
-          applicationDescription.style['white-space'] = 'pre';
-          applicationDescriptionToggle.innerHTML = '&blacktriangledown;';
-          applicationDescriptionToggle.style['position'] = 'fixed';
-        }
-        else {
-          applicationDescription.style['white-space'] = 'nowrap';
-          applicationDescriptionToggle.innerHTML = '&blacktriangleright;';
-          applicationDescriptionToggle.style['position'] = 'relative';
-          let y = applicationDescriptionToggle.getBoundingClientRect().y;
-          if (y < 0) {
-            applicationDescriptionToggle.scrollIntoView();
-          }
-        }
+      setupOverflowEditDiv({
+        overflow: applicationDescriptionToggle,
+        source: applicationDescription,
+        div: document.body.querySelector('.toggles'),
       });
+      // applicationDescriptionToggle.addEventListener('click', function (event) {
+      //   if (applicationDescription.style['white-space'] != 'pre') {
+      //     applicationDescription.style['white-space'] = 'pre';
+      //     applicationDescriptionToggle.innerHTML = '&blacktriangledown;';
+      //     applicationDescriptionToggle.style['position'] = 'fixed';
+      //   }
+      //   else {
+      //     applicationDescription.style['white-space'] = 'nowrap';
+      //     applicationDescriptionToggle.innerHTML = '&blacktriangleright;';
+      //     applicationDescriptionToggle.style['position'] = 'relative';
+      //     let y = applicationDescriptionToggle.getBoundingClientRect().y;
+      //     if (y < 0) {
+      //       applicationDescriptionToggle.scrollIntoView();
+      //     }
+      //   }
+      // });
       // SEE ALSO Pages
       // https://developer.mozilla.org/en-US/docs/Template:GroupData
       // described in
@@ -60,7 +128,7 @@
       let overviewUI = document.importNode(overview, "deep").firstElementChild;
       document.body.appendChild(overviewUI);
       // document.head.appendChild(document.createElement("base")).href = "https://developer.mozilla.org/";
-      document.title = 'Generated MDN Skeletons for API ' + nameOfApi;
+      document.title = data.title + ' for ' + nameOfApi;
       document.querySelector('h1#title').textContent = document.title;
       document.querySelector('div#production').textContent = 'Produced from ' + data.url;
       let overviewInterfacesHeadline = overviewUI.querySelector('h2#interfaces');
@@ -73,9 +141,11 @@
       subTreeSelect.addEventListener('change', function (event) {
         subTreeInput.value = event.target.value;
         mdnOverviewUrl.href = subTreeInput.value + nameOfApi + "_API$edit";
+        mdnOverviewUrl.disabled = false;
       });
       subTreeInput.addEventListener('input', function (event) {
         mdnOverviewUrl.href = subTreeInput.value + nameOfApi + "_API$edit";
+        mdnOverviewUrl.disabled = false;
       });
       mdnOverviewUrl.addEventListener('click', function (event) {
         event.preventDefault();
@@ -107,7 +177,8 @@
         xhr.send();
       });
       subTreeSelect.selectedIndex = -1;
-      let overviewTags = document.getElementById('overview_tags');
+      mdnOverviewUrl.disabled = true;
+      let overviewTags = overviewUI.querySelector('div.overview input.tags');
       let overviewPageTags = [
         "Overview",
         "API",
@@ -118,55 +189,13 @@
       overviewSource.style['display'] = 'none';
       let overviewEditToggle = overviewUI.querySelector('.edit_toggle');
       let overviewToggleDiv = overviewUI.querySelector('.toggles');
-      overviewEditToggle.addEventListener('click', function (event) {
-        let bcr = overviewToggleDiv.getBoundingClientRect();
-        if (overviewSource.style['display'] != 'none') {
-          overviewContent.innerHTML = overviewSource.textContent;
-          window.requestAnimationFrame(function(domHighResTimeStamp) {
-            overviewSource.style['display'] = 'none';
-            overviewContent.style['display'] = 'block';
-            overviewEditToggle.style['opacity'] = 1.0;
-            overviewOverflowToggle.style['visibility'] = 'visible';
-            overviewToggleDiv.style['position'] = 'relative';
-            overviewToggleDiv.style['top'] = '0';
-          });
-          if (bcr.y < 0) {
-            overviewToggleDiv.scrollIntoView();
-          }
-        }
-        else {
-          overviewSource.style['display'] = 'block';
-          overviewContent.style['display'] = 'none';
-          overviewEditToggle.style['opacity'] = 0.5;
-          overviewOverflowToggle.style['visibility'] = 'hidden';
-          overviewToggleDiv.style['position'] = 'fixed';
-          overviewToggleDiv.style['top'] = bcr.top + 'px';
-        }
-      });
       let overviewOverflowToggle = overviewUI.querySelector('.overflow_toggle');
-      overviewOverflowToggle.addEventListener('click', function (event) {
-        let bcr = overviewToggleDiv.getBoundingClientRect();
-        if (overviewContent.style['height'] == '100%') {
-          window.requestAnimationFrame(function(domHighResTimeStamp) {
-            overviewContent.style['height'] = '3rem';
-            overviewSource.style['white-space'] = 'nowrap';
-            overviewOverflowToggle.innerHTML = '&blacktriangleright;';
-            overviewEditToggle.style['visibility'] = 'hidden';
-            overviewToggleDiv.style['position'] = 'relative';
-            overviewToggleDiv.style['top'] = '0';
-          });
-          if (bcr.y < 0) {
-            overviewToggleDiv.scrollIntoView();
-          }
-        }
-        else {
-          overviewContent.style['height'] = '100%';
-          overviewSource.style['white-space'] = 'pre';
-          overviewOverflowToggle.innerHTML = '&blacktriangledown;';
-          overviewEditToggle.style['visibility'] = 'visible';
-          overviewToggleDiv.style['position'] = 'fixed';
-          overviewToggleDiv.style['top'] = bcr.top + 'px';
-        }
+      setupOverflowEditDiv({
+        edit: overviewEditToggle,
+        overflow: overviewOverflowToggle,
+        div: overviewToggleDiv,
+        source: overviewSource,
+        content: overviewContent
       });
       Array.prototype.forEach.call(overviewContent.querySelectorAll('span.api_name'), function (element) {
         element.parentElement.replaceChild(document.createTextNode(nameOfApi), element);

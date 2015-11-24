@@ -1,6 +1,6 @@
 {
   "id": "webidl2mdn-jetpack@addons.mozilla.org",
-  "title": "MDN API Referee",
+  "title": "MDN Web API Referee",
   "name": "webidl2mdn-jetpack",
   "version": "0.0.1",
   "description": "Create MDN API Reference Skeletons from WebIDL",

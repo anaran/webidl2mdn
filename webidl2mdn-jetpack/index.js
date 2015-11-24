@@ -117,6 +117,7 @@ tabs.on('load', function(tab) {
                 webidl2mdnWorker.port.emit('load_webidl2mdn', {
                   generator: package.title,
                   icon: package.icon,
+                  title: package.title,
                   url: originallyActiveTab.url,
                   AST: tree2
                 });
@@ -125,6 +126,7 @@ tabs.on('load', function(tab) {
                 webidl2mdnWorker.port.emit('load_webidl2mdn', {
                   generator: package.title,
                   icon: package.icon,
+                  title: package.title,
                   url: originallyActiveTab.url,
                   exception: e
                 });
