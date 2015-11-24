@@ -1,3 +1,8 @@
+div.toggles {
+  background-color: white;
+  opacity: 0.9;
+}
+
 pre.info {
   width: 90%;
   white-space: nowrap;

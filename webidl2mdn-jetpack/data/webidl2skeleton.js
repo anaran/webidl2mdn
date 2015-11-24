@@ -76,7 +76,7 @@
           options.overflow.style['visibility'] = 'visible';
           options.div.style['position'] = 'relative';
           options.div.scrollIntoView();
-          // options.div.style['top'] = 0;
+          options.div.style['top'] = 0;
           if (bcr && bcr.y < 0) {
           }
         });
@@ -107,7 +107,7 @@
           options.edit && (options.edit.style['visibility'] = 'hidden');
           options.div.style['position'] = 'relative';
           options.div.scrollIntoView();
-          // options.div.style['top'] = 0;
+          options.div.style['top'] = 0;
           if (bcr && bcr.y < 0) {
           }
         });
