@@ -91,7 +91,8 @@ tabs.on('load', function(tab) {
     let webidl2mdnTab, webidl2mdnWorker, skeletonMdnTab, skeletonMdnTabWorker;
     // let originallyActiveTab = tabs.activeTab;
     let originallyActiveTab = tab;
-    if (!/\.webidl\b/.test(tab.url)) {
+    // Good enough to handle raw display of github gist, code, and mozilla dxr and mxr.
+    if (!/(\/raw[-.\/].+\.webidl|\.webidl\?raw=1)$/.test(tab.url)) {
       return;
     }
     tabs.open({
@@ -121,7 +122,8 @@ tabs.on('load', function(tab) {
                   homepage: packageJson.homepage,
                   title: packageJson.title,
                   url: originallyActiveTab.url,
-                  AST: tree2
+                  AST: tree2,
+                  contentType: tab.contentType
                 });
               }
               catch (e) {
@@ -130,7 +132,8 @@ tabs.on('load', function(tab) {
                   icon: packageJson.icon,
                   title: packageJson.title,
                   url: originallyActiveTab.url,
-                  exception: e
+                  exception: e,
+                  contentType: tab.contentType
                 });
                 DEBUG_ADDON && console.log('exception', JSON.stringify(e, Object.keys(e), 2), e.toString());
               }

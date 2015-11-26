@@ -55,7 +55,7 @@
         else {
           options.destination.scrollIntoView();
           options.destination.focus();
-          self.port.emit('notification', { text: "I would like to report I don't like this notification." });
+          self.port.emit('notification', { text: "Select or type a relative path to where under MDN you want to put the generated content.\n\nI would like to report I don't like this notification." });
         }
       });
     }
@@ -149,6 +149,15 @@
         source: applicationDescription,
         div: document.body.querySelector('.toggles'),
       });
+      if ('exception' in data) {
+        applicationDescriptionToggle.click();
+        applicationDescription.style['color'] = 'red';
+        applicationDescription.style['font-weight'] = 'bold';
+        self.port.emit('notification', {
+          text: "Click here if you need to review and report this parsing error:\n\n"
+          + JSON.stringify(data, null, 2)
+        });
+      }
       // SEE ALSO Pages
       // https://developer.mozilla.org/en-US/docs/Template:GroupData
       // described in
