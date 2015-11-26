@@ -6,6 +6,7 @@ Trying to bring WebIDL and MDN closer together by generating page skeletons impl
 
 using [webidl2](https://www.npmjs.com/package/webidl2).
 
-## Firefox Add-on SDK Add-on
+## Firefox Add-on SDK Add-on (AKA jetpack)
 
-[jetpack add-on](webidl2mdn-jetpack/README.md).
+[MDN Web API Referee](webidl2mdn-jetpack/README.md) as a jetpack
+
