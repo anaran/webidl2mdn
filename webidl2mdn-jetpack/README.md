@@ -1,5 +1,3 @@
-#MDN Web API Referee
-MDN Web API Referee
 # MDN Web API Referee
 
 MDN Web API Referee Add-on for Desktop and Mobile Firefox 
