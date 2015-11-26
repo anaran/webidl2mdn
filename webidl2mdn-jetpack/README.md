@@ -4,11 +4,11 @@ MDN Web API Referee Add-on for Desktop and Mobile Firefox
 
 # Installation
 
-The ![][icon] Firefox Add-on is **not yet** distributed via addons.mozilla.org.
+The ![][icon] Firefox Add-on is distributed via addons.mozilla.org.
 
 [icon]: data/posts-48.png "MDN Web API Referee"
 
-See [which versions](https://addons.mozilla.org/en-US/firefox/addon/dunno/versions/) are available right now.
+See [which versions](https://addons.mozilla.org/en-US/firefox/addon/mdn-web-api-referee/versions/) are available right now.
 
 # README for Developers
 
@@ -17,7 +17,7 @@ developers and contributors.
 
 ## Add-on User Help
 
-[data/HELP.md](data/HELP.md) is what **not yet** gets converted to HTML and bundled with the add-on, accessible under the `Help` menu entry.
+[data/HELP.md](data/HELP.md) is what gets converted to HTML and **not yet** bundled with the add-on, accessible under the `Help` menu entry.
 
 ## Issues
 
