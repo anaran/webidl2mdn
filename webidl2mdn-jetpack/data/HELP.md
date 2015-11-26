@@ -14,7 +14,7 @@ to open an issue, since webidl2 does not understand the pecularities of Mozilla 
 
 Don't open an issue unless you have tried the following tips.
 
-See https://gist.github.com/anaran/d08cf8ccd082e81cf72a/revisions for changes I had to make to get https://gist.githubusercontent.com/anaran/d08cf8ccd082e81cf72a/raw/16df4b6d7c8dbc36212ad11c6ff070ccbde601a1/Apps.webidl to parse and generated skeletons.
+See https://gist.github.com/anaran/d08cf8ccd082e81cf72a/revisions for changes I had to make to get https://gist.githubusercontent.com/anaran/d08cf8ccd082e81cf72a/raw/16df4b6d7c8dbc36212ad11c6ff070ccbde601a1/Apps.webidl to parse and generate skeletons.
 
 I hope to get access to improved webidl2 sources soon that will be able to parse Mozilla WebIDL files.
 
