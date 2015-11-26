@@ -92,7 +92,9 @@ tabs.on('load', function(tab) {
     // let originallyActiveTab = tabs.activeTab;
     let originallyActiveTab = tab;
     // Good enough to handle raw display of github gist, code, and mozilla dxr and mxr.
-    if (!/(\/raw[-.\/].+\.webidl|\.webidl\?raw=1)$/.test(tab.url)) {
+    // Don't interfere when user wants to view-source the file.
+    if (!/(\/raw[-.\/].+\.webidl|\.webidl\?raw=1)$/.test(tab.url) ||
+       /^view-source:/.test(tab.url)) {
       return;
     }
     tabs.open({
