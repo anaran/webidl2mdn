@@ -61,6 +61,11 @@
     }
   }
   function setupOverflowEditDiv(options) {
+    let triangles = document.importNode(
+      document.querySelector('template.triangles').content,
+      "deep");
+    let triangleRight = triangles.children[0].textContent;
+    let triangleDown = triangles.children[1].textContent;
     options.div &&
       options.edit &&
       options.source &&
@@ -68,16 +73,16 @@
       options.edit.addEventListener('click', function (event) {
       let bcr = options.div && options.div.getBoundingClientRect();
       if (options.source.style['display'] != 'none') {
-        options.content.innerHTML = options.source.textContent;
+        // options.content.innerHTML = options.source.textContent;
         window.requestAnimationFrame(function(domHighResTimeStamp) {
           options.source.style['display'] = 'none';
           options.content.style['display'] = 'block';
           options.edit.style['opacity'] = 1.0;
           options.overflow.style['visibility'] = 'visible';
-          options.div.style['position'] = 'relative';
-          options.div.scrollIntoView();
+          options.div.style['position'] = 'initial';
           options.div.style['top'] = 0;
-          if (bcr && bcr.y < 0) {
+          options.div.scrollIntoView();
+          if (bcr && (bcr.y < 0/* || bcr.y > window.clientHeight*/)) {
           }
         });
       }
@@ -103,26 +108,31 @@
         window.requestAnimationFrame(function(domHighResTimeStamp) {
           options.content && (options.content.style['height'] = '3rem');
           options.source && (options.source.style['white-space'] = 'nowrap');
-          options.overflow.innerHTML = '&blacktriangleright;';
+          // options.overflow.innerHTML = '&blacktriangleright;';
+          options.overflow.textContent = triangleRight;
           options.edit && (options.edit.style['visibility'] = 'hidden');
-          options.div.style['position'] = 'relative';
-          options.div.scrollIntoView();
+          options.div.style['position'] = 'initial';
+          // options.overflow.style['transform'] = 'rotate(45deg)';
           options.div.style['top'] = 0;
-          if (bcr && bcr.y < 0) {
+          options.div.scrollIntoView();
+          if (bcr && (bcr.y < 0/* || bcr.y > window.clientHeight*/)) {
           }
         });
       }
       else {
         options.content && (options.content.style['height'] = '100%');
         options.source && (options.source.style['white-space'] = 'pre');
-        options.overflow.innerHTML = '&blacktriangledown;';
+        // options.overflow.innerHTML = '&blacktriangledown;';
+        options.overflow.textContent = triangleDown;
         options.edit && (options.edit.style['visibility'] = 'visible');
         // options.div.scrollIntoView();
         options.div.style['position'] = 'fixed';
+        // options.overflow.style['transform'] = 'rotate(90deg)';
         // options.div.style['top'] = 0;
         options.div.style['top'] = bcr.top + 'px';
       }
     });
+    options.edit && (options.edit.style['visibility'] = 'hidden');
   }
   let tryConvertToJson = function(text) {
     let json = text.replace(/^\s*\/\/.+\n/gm, '');

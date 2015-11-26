@@ -11,6 +11,7 @@ pre.info {
 }
 
 pre.source {
+  border: 1px solid black;
   width: 90%;
   white-space: nowrap;
   overflow: hidden;
@@ -18,6 +19,7 @@ pre.source {
 }
 
 section.content {
+  border: 1px dashed black;
   overflow: hidden;
   height: 3rem;
 }
