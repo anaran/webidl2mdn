@@ -9,8 +9,8 @@ Click the `Raw` link or button after you visit a WebIDL file.
 
 A new browser tab will open to show you what MDN API pages can be created from given file.
 
-Most likely you will get a bold red error message and a clickable notification you can click
-to open an issue, since webidl2 does not understand the pecularities of Mozilla WebIDL.
+Most likely you will get a bold red error message and a clickable notification you can ues
+to open an issue, since webidl2 does not understand the pecularities of Mozilla WebIDL. see [Different dialects of WebIDL](https://developer.mozilla.org/en-US/docs/MDN/Contribute/Howto/Write_an_API_reference/Information_contained_in_a_WebIDL_file#Different_dialects_of_WebIDL).
 
 Don't open an issue unless you have tried the following tips.
 
