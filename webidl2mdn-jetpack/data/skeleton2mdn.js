@@ -10,7 +10,7 @@
 // Firefox Addon Content Script.
 // require is not available in content scripts.
 // let sp = require('sdk/simple-prefs');
-// console.log('document.readyState', document.readyState);
+console.log('document.readyState', document.readyState);
 // (function() {
 let DEBUG_ADDON = false;
 

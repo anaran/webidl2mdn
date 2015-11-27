@@ -58,6 +58,6 @@ div.settings {
   border-bottom: 1px solid black;
 }
 
-a.settings {
+p.links a {
   margin: 0.5rem;
 }

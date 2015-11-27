@@ -55,7 +55,10 @@
         else {
           options.destination.scrollIntoView();
           options.destination.focus();
-          self.port.emit('notification', { text: "Select or type a relative path to where under MDN you want to put the generated content.\n\nI would like to report I don't like this notification." });
+          self.port.emit('notification', {
+            text: "Select or type a relative path to where under MDN you want to put the generated content.\n\nI would like to report I don't like this notification.",
+            title: options.notification || 'options.notification is missing'
+          });
         }
       });
     }
@@ -73,7 +76,7 @@
       options.edit.addEventListener('click', function (event) {
       let bcr = options.div && options.div.getBoundingClientRect();
       if (options.source.style['display'] != 'none') {
-        // options.content.innerHTML = options.source.textContent;
+        options.content.innerHTML = options.source.textContent;
         window.requestAnimationFrame(function(domHighResTimeStamp) {
           options.source.style['display'] = 'none';
           options.content.style['display'] = 'block';
@@ -91,9 +94,7 @@
         options.content.style['display'] = 'none';
         options.edit.style['opacity'] = 0.5;
         options.overflow.style['visibility'] = 'hidden';
-        // options.div.scrollIntoView();
         options.div.style['position'] = 'fixed';
-        // options.div.style['top'] = 0;
         options.div.style['top'] = bcr.top + 'px';
       }
     });
@@ -108,7 +109,6 @@
         window.requestAnimationFrame(function(domHighResTimeStamp) {
           options.content && (options.content.style['height'] = '3rem');
           options.source && (options.source.style['white-space'] = 'nowrap');
-          // options.overflow.innerHTML = '&blacktriangleright;';
           options.overflow.textContent = triangleRight;
           options.edit && (options.edit.style['visibility'] = 'hidden');
           options.div.style['position'] = 'initial';
@@ -125,10 +125,8 @@
         // options.overflow.innerHTML = '&blacktriangledown;';
         options.overflow.textContent = triangleDown;
         options.edit && (options.edit.style['visibility'] = 'visible');
-        // options.div.scrollIntoView();
         options.div.style['position'] = 'fixed';
         // options.overflow.style['transform'] = 'rotate(90deg)';
-        // options.div.style['top'] = 0;
         options.div.style['top'] = bcr.top + 'px';
       }
     });
@@ -165,7 +163,8 @@
         applicationDescription.style['font-weight'] = 'bold';
         self.port.emit('notification', {
           text: "Click here if you need to review and report this parsing error:\n\n"
-          + JSON.stringify(data, null, 2)
+          + JSON.stringify(data, null, 2),
+          title: data.title + ' parsing error'
         });
       }
       // SEE ALSO Pages
@@ -224,7 +223,8 @@
         path: nameOfApi + '_API',
         destination: subTreeInput,
         source: overviewSource,
-        tags: overviewPageTags 
+        tags: overviewPageTags,
+        notification: data.title + ' UI feedback'
       });
       Array.prototype.forEach.call(overviewUI.querySelectorAll('span.api_name'), function (element) {
         element.parentElement.replaceChild(document.createTextNode(nameOfApi), element);
@@ -288,7 +288,8 @@
               path: value.name,
               destination: subTreeInput,
               source: interfacePageSource,
-              tags: interfacePageTags 
+              tags: interfacePageTags,
+              notification: data.title + ' UI feedback'
             });
             Array.prototype.forEach.call(interfacePageUI.querySelectorAll('span.api_name'), function (element) {
               element.parentElement.replaceChild(document.createTextNode(nameOfApi), element);

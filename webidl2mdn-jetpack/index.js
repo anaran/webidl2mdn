@@ -177,11 +177,11 @@ tabs.on('load', function(tab) {
           let notifications = require('sdk/notifications');
           let qs = require("sdk/querystring");
           notifications.notify({
-            title: packageJson.title,
+            title: data.title || packageJson.title,
             text: data.text,
             data: qs.stringify({
               title:
-              packageJson.title + ' in ' + self.version,
+              (data.title || packageJson.title) + ' in ' + self.version,
               body:
               data.text + "\n"
             }),

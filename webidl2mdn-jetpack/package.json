@@ -2,7 +2,7 @@
   "id": "webidl2mdn-jetpack@addons.mozilla.org",
   "title": "MDN Web API Referee",
   "name": "webidl2mdn-jetpack",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Create MDN API Reference Skeletons by visiting raw WebIDL files (e.g. at https://mxr.mozilla.org/mozilla-central/source/dom/webidl/ or https://gist.github.com/search?l=webidl&q=.webidl)",
   "main": "index.js",
   "author": "anaran",
@@ -24,9 +24,9 @@
   ],
   "permissions": {
     "cross-domain-content": ["https://developer.mozilla.org/"]
-  }
+  },
   "repository" : {
     "type" : "git",
     "url" : "https://github.com/anaran/webidl2mdn.git"
-  },
+  }
 }
