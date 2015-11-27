@@ -6,6 +6,9 @@
   "description": "Create MDN API Reference Skeletons by visiting raw WebIDL files (e.g. at https://mxr.mozilla.org/mozilla-central/source/dom/webidl/ or https://gist.github.com/search?l=webidl&q=.webidl)",
   "main": "index.js",
   "author": "anaran",
+  "bugs": {
+    "url" : "https://github.com/anaran/webidl2mdn/issues"
+  },
   "dependencies": {
     "webidl2": "^2.0.11"
   },
@@ -22,4 +25,8 @@
   "permissions": {
     "cross-domain-content": ["https://developer.mozilla.org/"]
   }
+  "repository" : {
+    "type" : "git",
+    "url" : "https://github.com/anaran/webidl2mdn.git"
+  },
 }

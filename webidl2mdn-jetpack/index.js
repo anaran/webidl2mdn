@@ -106,8 +106,6 @@ tabs.on('load', function(tab) {
         webidl2mdnWorker = tab.attach({
           contentScriptFile: [
             './webidl2skeleton.js',
-            // './report-json-parse-error.js',
-            // './diagnostics_overlay.js'
           ],
           onError: reportErrors
         });
@@ -190,7 +188,7 @@ tabs.on('load', function(tab) {
             onClick: function (data) {
               tabs.open({
                 inNewWindow: true,
-                url: packageJson.homepage + '/issues/new?' + data,
+                url: packageJson.bugs.url + '/new?' + data,
                 onClose: function() {
                   tabs.activeTab.activate();
                 }});
