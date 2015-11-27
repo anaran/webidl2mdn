@@ -17,12 +17,14 @@ developers and contributors.
 
 ## Add-on User Help
 
-[data/HELP.md](data/HELP.md) is what gets converted to HTML and **not yet** bundled with the add-on, accessible under the `Help` menu entry.
+[data/HELP.md](data/HELP.md) is also accessible via the `Help` link in the add-on tab.
 
 ## Issues
 
 See [Issues ·
 anaran/webidl2mdn](https://github.com/anaran/webidl2mdn/issues).
+
+You can search for existing issues via the `Issues` link in the add-on tab.
 
 Some of these may be created directly by add-on users when they click
 the error notifications provided by the add-on.
