@@ -10,11 +10,11 @@
 // Firefox Addon Content Script.
 // require is not available in content scripts.
 // let sp = require('sdk/simple-prefs');
-console.log('document.readyState', document.readyState);
 // (function() {
 let DEBUG_ADDON = false;
 
 typeof document != 'undefined' && document.addEventListener('readystatechange', function (event) {
+  DEBUG_ADDON && console.log('document.readyState', document.readyState);
   if (document.readyState == 'complete') {
     // self is undefined when using require in jpm test.
     (typeof self !== 'undefined') && self.port.on('load_editMdn', function(data) {
