@@ -85,7 +85,7 @@
           options.overflow.style['visibility'] = 'visible';
           options.div.style['position'] = 'initial';
           options.div.style['top'] = 0;
-          options.div.scrollIntoView();
+          // options.div.scrollIntoView();
           if (bcr && (bcr.y < 0/* || bcr.y > window.clientHeight*/)) {
           }
         });
@@ -99,6 +99,17 @@
         options.div.style['top'] = bcr.top + 'px';
       }
     });
+    if (options.top_link && options.content) {
+      // Don't show link initially.
+      options.top_link.style['display'] = 'none';
+      options.top_link.textContent = options.top_link_text;
+      // NOTE: not used, but href needs to be set for link to be tangible.
+      options.top_link.href = window.location.href + '#top';
+      options.top_link.addEventListener('click', function (event) {
+        event.preventDefault();
+        options.content.scrollIntoView();
+      });
+    }
     options.div &&
       options.overflow &&
       options.overflow.addEventListener('click', function (event) {
@@ -115,10 +126,13 @@
           options.div.style['position'] = 'initial';
           // options.overflow.style['transform'] = 'rotate(45deg)';
           options.div.style['top'] = 0;
-          options.div.scrollIntoView();
+          // options.div.scrollIntoView();
           if (bcr && (bcr.y < 0/* || bcr.y > window.clientHeight*/)) {
           }
         });
+        if (options.top_link) {
+          options.top_link.style['display'] = 'none';
+        }
       }
       else {
         options.content && (options.content.style['height'] = '100%');
@@ -128,6 +142,9 @@
         options.div.style['position'] = 'fixed';
         // options.overflow.style['transform'] = 'rotate(90deg)';
         options.div.style['top'] = bcr.top + 'px';
+        if (options.top_link) {
+          options.top_link.style['display'] = 'inline';
+        }
       }
     });
     // options.edit && (options.edit.style['visibility'] = 'hidden');
@@ -148,6 +165,8 @@
       document.getElementById('favicon').href = data.icon;
       let applicationDescription = document.getElementById('application_description');
       let applicationDescriptionToggle = document.getElementById('application_description_toggle');
+      // let applicationDescriptionTopLink = applicationDescription.querySelector('a.link');
+      let applicationDescriptionTopLink = applicationDescriptionToggle.nextElementSibling;
       // NOTE: Keep this first, before adding nodes to document.
       // Array.prototype.forEach.call(document.querySelectorAll('div.settings'), function(setting) {
       //   document.body.removeChild(setting);
@@ -156,7 +175,10 @@
       setupOverflowEditDiv({
         overflow: applicationDescriptionToggle,
         source: applicationDescription,
+        content: applicationDescription,
         div: document.body.querySelector('.toggles'),
+        top_link: applicationDescriptionTopLink,
+        top_link_text: 'Application Description'
       });
       if ('exception' in data) {
         applicationDescriptionToggle.click();
@@ -204,12 +226,15 @@
       let overviewEditToggle = overviewUI.querySelector('.edit_toggle');
       let overviewToggleDiv = overviewUI.querySelector('.toggles');
       let overviewOverflowToggle = overviewUI.querySelector('.overflow_toggle');
+      let overviewTopLink = overviewUI.querySelector('a.link');
       setupOverflowEditDiv({
         edit: overviewEditToggle,
         overflow: overviewOverflowToggle,
         div: overviewToggleDiv,
         source: overviewSource,
-        content: overviewContent
+        content: overviewContent,
+        top_link: overviewTopLink,
+        top_link_text: nameOfApi + ' Overview'
       });
       let subTreeSelect = document.body.querySelector('#url_sub_tree_select');
       let subTreeInput = document.body.querySelector('#url_sub_tree');
@@ -277,12 +302,15 @@
             let interfacePageEditToggle = interfacePageUI.querySelector('.edit_toggle');
             let interfacePageToggleDiv = interfacePageUI.querySelector('.toggles');
             let interfacePageOverflowToggle = interfacePageUI.querySelector('.overflow_toggle');
+            let interfacePageOverflowTopLink = interfacePageUI.querySelector('a.link');
             setupOverflowEditDiv({
               edit: interfacePageEditToggle,
               overflow: interfacePageOverflowToggle,
               div: interfacePageToggleDiv,
               source: interfacePageSource,
-              content: interfacePageContent
+              content: interfacePageContent,
+              top_link: interfacePageOverflowTopLink,
+              top_link_text: value.name + ' Interface'
             });
             setupMdnButton({
               button: interfacePageUI.querySelector('.mdn_overview_url'),
