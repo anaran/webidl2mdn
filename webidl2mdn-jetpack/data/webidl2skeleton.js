@@ -384,7 +384,7 @@
                     element.parentElement.replaceChild(document.createTextNode(value.name + '.' + member.name), element)
                   });
                   if (member.readonly) {
-                    propertyUI.firstElementChild.textContent += '{{readonlyInline}}';
+                    propertyUI.firstElementChild.textContent += ' {{ReadOnlyInline}}';
                   }
                   if (member.extAttrs.some(function (attr) {
                     if (attr.name == 'CheckAnyPermissions' &&
@@ -397,7 +397,7 @@
                       return true;
                     }
                   })) {
-                    propertyUI.firstElementChild.textContent += '{{B2GOnlyHeader2("certified")}}';
+                    propertyUI.firstElementChild.textContent += ' {{B2GOnlyHeader2("certified")}}';
                   }
                   if (member.idlType.idlType == 'EventHandler') {
                     eventHandlerProperties.appendChild(propertyUI);
