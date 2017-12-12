@@ -1,6 +1,10 @@
 div.toggles {
   background-color: white;
   opacity: 0.9;
+    transition: opacity 1s 0.5s;
+}
+
+div.toggles a.link {
 }
 
 pre.info {

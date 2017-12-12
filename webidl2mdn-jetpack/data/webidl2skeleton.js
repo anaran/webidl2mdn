@@ -101,13 +101,18 @@
     });
     if (options.top_link && options.content) {
       // Don't show link initially.
-      options.top_link.style['display'] = 'none';
+      // options.top_link.style['display'] = 'none';
       options.top_link.textContent = options.top_link_text;
       // NOTE: not used, but href needs to be set for link to be tangible.
       options.top_link.href = window.location.href + '#top';
       options.top_link.addEventListener('click', function (event) {
         event.preventDefault();
-        options.content.scrollIntoView();
+        if (options.div.style['position'] == 'fixed') {
+          options.content.scrollIntoView();
+        }
+        else {
+          event.target.scrollIntoView();
+        }
       });
     }
     options.div &&
@@ -119,32 +124,42 @@
           options.source &&
           options.source.style['white-space'] == 'pre') {
         window.requestAnimationFrame(function(domHighResTimeStamp) {
-          options.content && (options.content.style['height'] = '3rem');
+          if (options.content) {
+            options.content.style['height'] = '3rem';
+            // options.content.style['border-style'] = 'dashed';
+          }
           options.source && (options.source.style['white-space'] = 'nowrap');
           options.overflow.textContent = triangleRight;
           // options.edit && (options.edit.style['visibility'] = 'hidden');
           options.div.style['position'] = 'initial';
           // options.overflow.style['transform'] = 'rotate(45deg)';
           options.div.style['top'] = 0;
-          // options.div.scrollIntoView();
+          options.div.style['opacity'] = 0.5;
+          // options.div.style['opacity'] = 0.5;
+          options.div.scrollIntoView();
           if (bcr && (bcr.y < 0/* || bcr.y > window.clientHeight*/)) {
           }
+          if (options.top_link) {
+          }
         });
-        if (options.top_link) {
-          options.top_link.style['display'] = 'none';
-        }
       }
       else {
-        options.content && (options.content.style['height'] = '100%');
-        options.source && (options.source.style['white-space'] = 'pre');
-        options.overflow.textContent = triangleDown;
-        // options.edit && (options.edit.style['visibility'] = 'visible');
-        options.div.style['position'] = 'fixed';
-        // options.overflow.style['transform'] = 'rotate(90deg)';
-        options.div.style['top'] = bcr.top + 'px';
-        if (options.top_link) {
-          options.top_link.style['display'] = 'inline';
-        }
+        window.requestAnimationFrame(function(domHighResTimeStamp) {
+          if (options.content) {
+            options.content.style['height'] = '100%';
+            // options.content.style['border-style'] = 'solid';
+          }
+          options.source && (options.source.style['white-space'] = 'pre');
+          options.overflow.textContent = triangleDown;
+          // options.edit && (options.edit.style['visibility'] = 'visible');
+          options.div.style['position'] = 'fixed';
+          // options.overflow.style['transform'] = 'rotate(90deg)';
+          options.div.style['top'] = bcr.top + 'px';
+          options.div.style['opacity'] = 1.0;
+          // options.div.style['opacity'] = 1.0;
+          if (options.top_link) {
+          }
+        });
       }
     });
     // options.edit && (options.edit.style['visibility'] = 'hidden');
