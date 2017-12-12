@@ -19,7 +19,7 @@ reported, you can report a [new issue](https://github.com/anaran/webidl2mdn/issu
 
 # Limitations
 
-Most likely you will get a bold red error message and a clickable notification you can ues
+Most likely you will get a bold red error message and a clickable notification you can use
 to open an issue,
 since webidl2 does not understand the pecularities of Mozilla WebIDL.
 
