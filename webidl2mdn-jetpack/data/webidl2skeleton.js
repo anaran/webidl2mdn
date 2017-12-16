@@ -1,4 +1,3 @@
-;
 'use strict';
 //
 // Replace /\b(const|let)\B/ with "$1 "
@@ -11,7 +10,7 @@
 // require is not available in content scripts.
 // let sp = require('sdk/simple-prefs');
 (function() {
-  let DEBUG_ADDON = false;
+  let DEBUG_ADDON = true;
   function setupMdnButton(options) {
     if (options.button &&
         options.path &&
@@ -20,6 +19,23 @@
         options.tags) {
       options.button.value = 'Create/add to ' + options.path + ' page on MDN';
       options.button.setAttribute('data-path', options.path);
+
+      browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
+                  switch (message.type) {
+
+                  case 'request_editMdn': {
+
+                    browser.runtime.sendMessage({
+                      type: 'load_editMdn',
+                      source: options.source.textContent,
+                      tags: options.tags,
+                    });
+                    break;
+                  }
+
+                  }
+                });
+
       options.button.addEventListener('click', function (event) {
         // event.preventDefault();
         if (options.destination && options.destination.value.length > 0 &&
@@ -31,18 +47,34 @@
             if (this.readyState == xhr.DONE) {
               switch (this.statusText) {
                 case "OK": {
-                  self.port.emit('request_skeleton2mdn', {
+
+                browser.runtime.sendMessage({
+                  type: 'request_skeleton2mdn',
                     source: options.source.textContent,
                     tags: options.tags,
                     url: url
+                }).then(res => {
+                  console.log(res);
+                }).catch(err => {
+                  console.log(err);
                   });
                   break;
                 }
                 case "NOT FOUND": {
-                  self.port.emit('request_skeleton2mdn', {
+                browser.runtime.sendMessage({
+                  type: 'request_skeleton2mdn',
                     source: options.source.textContent,
                     tags: options.tags,
                     url: this.responseURL.replace(/\$edit/, '')
+                }).then(res => {
+                  console.log(res);
+                  browser.runtime.sendMessage({
+                    type: 'request_editMdn',
+                    source: options.source.textContent,
+                    tags: options.tags,
+                  });
+                }).catch(err => {
+                  console.log(err);
                   });
                   break;
                 }
@@ -55,10 +87,10 @@
         else {
           options.destination.scrollIntoView();
           options.destination.focus();
-          self.port.emit('notification', {
-            text: "Select or type a relative path to where under MDN you want to put the generated content.\n\nI would like to report I don't like this notification.",
-            title: options.notification || 'options.notification is missing'
-          });
+          // (typeof self !== 'undefined') && self.port.emit('notification', {
+          //   text: "Select or type a relative path to where under MDN you want to put the generated content.\n\nI would like to report I don't like this notification.",
+          //   title: options.notification || 'options.notification is missing'
+          // });
         }
       });
     }
@@ -171,13 +203,16 @@
     json = json.replace(/([^"\/])\b(\w(\w|\d)*):/g, '$1"$2":');
     return json;
   };
-  // self is undefined when using require in jpm test.
-  (typeof self !== 'undefined') && self.port.on('load_webidl2mdn', function(data) {
+  browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    switch (message.type) {
+
+    case 'load_AST': {
+      // formerly 'load_webidl2mdn'
     try {
-      DEBUG_ADDON && console.log('load_webidl2mdn', data);
-      let path = data.url.split('/');
-      let nameOfApi = data.url.match(/([^\/]+)\.webidl\b/)[1];
-      document.getElementById('favicon').href = data.icon;
+        DEBUG_ADDON && console.log('load_AST', message);
+        let path = message.url.split('/');
+        let nameOfApi = message.url.match(/([^\/]+)\.webidl\b/)[1];
+        document.getElementById('favicon').href = message.icon;
       let applicationDescription = document.getElementById('application_description');
       let applicationDescriptionToggle = document.getElementById('application_description_toggle');
       // let applicationDescriptionTopLink = applicationDescription.querySelector('a.link');
@@ -186,7 +221,7 @@
       // Array.prototype.forEach.call(document.querySelectorAll('div.settings'), function(setting) {
       //   document.body.removeChild(setting);
       // });
-      applicationDescription.textContent = JSON.stringify(data, null, 2);
+        applicationDescription.textContent = JSON.stringify(message, null, 2);
       setupOverflowEditDiv({
         overflow: applicationDescriptionToggle,
         source: applicationDescription,
@@ -195,15 +230,15 @@
         top_link: applicationDescriptionTopLink,
         top_link_text: 'Application Description'
       });
-      if ('exception' in data) {
+        if ('exception' in message) {
         applicationDescriptionToggle.click();
         applicationDescription.style['color'] = 'red';
         applicationDescription.style['font-weight'] = 'bold';
-        self.port.emit('notification', {
-          text: "Click here if you need to review and report this parsing error:\n\n"
-          + JSON.stringify(data, null, 2),
-          title: data.title + ' parsing error'
-        });
+          // (typeof self !== 'undefined') && self.port.emit('notification', {
+          //   text: "Click here if you need to review and report this parsing error:\n\n"
+          //     + JSON.stringify(message, null, 2),
+          //   title: message.title + ' parsing error'
+          // });
       }
       // SEE ALSO Pages
       // https://developer.mozilla.org/en-US/docs/Template:GroupData
@@ -215,16 +250,16 @@
       let productionNode = document.importNode(
         document.querySelector('template.production').content,
         "deep");
-      productionNode.firstElementChild.href = data.homepage;
-      productionNode.firstElementChild.textContent = data.generator;
-      productionNode.lastElementChild.textContent = ' from ' + data.url;
+        productionNode.firstElementChild.href = message.homepage;
+        productionNode.firstElementChild.textContent = message.generator;
+        productionNode.lastElementChild.textContent = ' from ' + message.url;
       let overview = document.querySelector('template.overview').content;
       let overviewUI = document.importNode(overview, "deep").firstElementChild;
       document.body.appendChild(overviewUI);
       // document.head.appendChild(document.createElement("base")).href = "https://developer.mozilla.org/";
-      document.title = data.title + ' for ' + nameOfApi;
+        document.title = message.title + ' for ' + nameOfApi;
       document.querySelector('h1#title').textContent = document.title;
-      document.querySelector('div#production').textContent = 'Produced from ' + data.url;
+        document.querySelector('div#production').textContent = 'Produced from ' + message.url;
       let overviewInterfacesHeadline = overviewUI.querySelector('h2#interfaces');
       overviewInterfacesHeadline.textContent = nameOfApi + ' Interfaces';
       let overviewSource = overviewUI.querySelector('.source');
@@ -265,19 +300,19 @@
         destination: subTreeInput,
         source: overviewSource,
         tags: overviewPageTags,
-        notification: data.title + ' UI feedback'
+          notification: message.title + ' UI feedback'
       });
       Array.prototype.forEach.call(overviewUI.querySelectorAll('span.api_name'), function (element) {
         element.parentElement.replaceChild(document.createTextNode(nameOfApi), element);
       });
       document.createComment
       Array.prototype.forEach.call(overviewUI.querySelectorAll('span.generator_name'), function (element) {
-        // element.parentElement.replaceChild(document.createTextNode(data.generator + ' from ' + data.url), element);
+          // element.parentElement.replaceChild(document.createTextNode(message.generator + ' from ' + message.url), element);
         element.parentElement.replaceChild(productionNode, element);
       });
       // See https://developer.mozilla.org/en-US/docs/MDN/Contribute/Howto/Write_an_API_reference
       let interfaceDefinitionList = overviewContent.querySelector('#interface_definitions');
-      data.AST.forEach(function (value) {
+        message.AST.forEach(function (value) {
         switch (value.type) {
           case "dictionary": {
             break;
@@ -333,7 +368,7 @@
               destination: subTreeInput,
               source: interfacePageSource,
               tags: interfacePageTags,
-              notification: data.title + ' UI feedback'
+              notification: message.title + ' UI feedback'
             });
             Array.prototype.forEach.call(interfacePageUI.querySelectorAll('span.api_name'), function (element) {
               element.parentElement.replaceChild(document.createTextNode(nameOfApi), element);
@@ -344,11 +379,11 @@
             let productionNode = document.importNode(
               document.querySelector('template.production').content,
               "deep");
-            productionNode.firstElementChild.href = data.homepage;
-            productionNode.firstElementChild.textContent = data.generator;
-            productionNode.lastElementChild.textContent = ' from ' + data.url;
+            productionNode.firstElementChild.href = message.homepage;
+            productionNode.firstElementChild.textContent = message.generator;
+            productionNode.lastElementChild.textContent = ' from ' + message.url;
             Array.prototype.forEach.call(interfacePageContent.querySelectorAll('span.generator_name'), function (element) {
-              // element.parentElement.replaceChild(document.createTextNode(data.generator + ' from ' + data.url), element);
+              // element.parentElement.replaceChild(document.createTextNode(message.generator + ' from ' + message.url), element);
               element.parentElement.replaceChild(productionNode, element);
             });
             let properties = interfacePageContent.querySelector('#property_definitions');
@@ -475,7 +510,18 @@
       // console.exception(e);
       console.log('exception', JSON.stringify(e, Object.keys(e), 2), e.toString());
     }
+      break;
+    }
+
+    default: return false;
+      
+    }
   });
-  // self is undefined when using require in jpm test.
-  (typeof self !== 'undefined') && self.port.emit('request_webidl2mdn');
+  // browser.runtime.sendMessage({
+  //   type: 'request_webidl2mdn'
+  // }).then(res => {
+  //   console.log(res);
+  // }).catch(err => {
+  //   console.log(err);
+  // });
 })();

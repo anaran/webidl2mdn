@@ -4,10 +4,12 @@ Create MDN API Reference Skeletons by visiting raw WebIDL files
 
 Here's where to find some if you don't have your own
 
-* https://mxr.mozilla.org/mozilla-central/source/dom/webidl/
+* https://dxr.mozilla.org/mozilla-central/source/dom/webidl/
 * https://gist.github.com/search?l=webidl&q=.webidl
 
 Click the `Raw` link or button after you visit a WebIDL file.
+
+Note: The extension currently () does not load for github gists, e.g. https://gist.githubusercontent.com/anaran/d08cf8ccd082e81cf72a/raw/16df4b6d7c8dbc36212ad11c6ff070ccbde601a1/Apps.webidl . Visiting a local copy after download will work.
 
 A new browser tab will open to show you what MDN API pages can be created from given file.
 

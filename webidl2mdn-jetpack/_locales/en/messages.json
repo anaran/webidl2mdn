@@ -1,0 +1,23 @@
+{
+  "help_menu_entry": {
+    "message": "Hilfe"
+  },
+  "help_path": {
+    "message": "data/HELP-de.html"
+  },
+  "settings_menu_entry": {
+    "message": "Options"
+  },
+  "addon_description": {
+    "message": "Create MDN API Reference Skeletons by visiting raw WebIDL files (e.g. at https://dxr.mozilla.org/mozilla-central/source/dom/webidl/ or https://gist.github.com/search?l=webidl&q=.webidl)"
+  },
+  "addon_homepage": {
+    "message": "https://github.com/anaran/webidl2mdn"
+  },
+  "addon_name": {
+    "message": "MDN Web API Referee"
+  },
+  "addon_title": {
+    "message": "MDN Web API Referee"
+  }
+}

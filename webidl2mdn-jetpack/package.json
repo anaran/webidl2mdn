@@ -3,14 +3,14 @@
   "title": "MDN Web API Referee",
   "name": "webidl2mdn-jetpack",
   "version": "0.0.2",
-  "description": "Create MDN API Reference Skeletons by visiting raw WebIDL files (e.g. at https://mxr.mozilla.org/mozilla-central/source/dom/webidl/ or https://gist.github.com/search?l=webidl&q=.webidl)",
+  "description": "Create MDN API Reference Skeletons by visiting raw WebIDL files (e.g. at https://dxr.mozilla.org/mozilla-central/source/dom/webidl/ or https://gist.github.com/search?l=webidl&q=.webidl)",
   "main": "index.js",
   "author": "anaran",
   "bugs": {
     "url" : "https://github.com/anaran/webidl2mdn/issues"
   },
   "dependencies": {
-    "webidl2": "^2.0.11"
+    "webidl2": "^9.0.0"
   },
   "engines": {
     "firefox": ">=38.0a1",
