@@ -9,7 +9,7 @@
 gulpfile.js
 bower_components/
 # lib/anaran-jetpack-add-on/pouchdb-add-on-sdk-shim.js
-node_modules/
+# node_modules/
 test/
 tmp/
 # !bower_components/pouchdb/*
