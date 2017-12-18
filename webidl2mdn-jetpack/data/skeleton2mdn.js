@@ -18,10 +18,8 @@ document.addEventListener('readystatechange', function (event) {
   DEBUG_ADDON && console.log('document.readyState', document.readyState);
   if (document.readyState == 'complete') {
     DEBUG_ADDON && console.log('document.readyState', document.readyState);
-    // self is undefined when using require in jpm test.
-    // (typeof self !== 'undefined') && self.port.on('load_editMdn', function(data) {
     browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
-      console.log(message, sender);
+      DEBUG_ADDON && console.log(message, sender);
       switch (message.type) {
 
       case 'load_editMdn': {
@@ -30,12 +28,19 @@ document.addEventListener('readystatechange', function (event) {
           if (!toggleSource) {
             window.alert(`Source toggle button is ${toggleSource}`);
           }
-          console.log('toggleSource', toggleSource);
+          DEBUG_ADDON && console.log('toggleSource', toggleSource);
           if (toggleSource) {
             toggleSource.click();
             let sourceTags = document.querySelector('.tagit-new>input');
             let sourceTextarea = document.querySelector('textarea.cke_source.cke_editable');
-            let commaEvent = new KeyboardEvent("keydown", {"keyCode": KeyEvent.DOM_VK_COMMA, "which": KeyEvent.DOM_VK_COMMA, "target": sourceTags, key: ",", code: "Comma", target: sourceTags });
+            let commaEvent = new KeyboardEvent('keydown', {
+              'keyCode': KeyEvent.DOM_VK_COMMA,
+              'which': KeyEvent.DOM_VK_COMMA,
+              'target': sourceTags,
+              key: ',',
+              code: 'Comma',
+              target: sourceTags
+            });
             if (sourceTextarea && sourceTags) {
               sourceTextarea.value = message.source + sourceTextarea.value;
               message.tags.forEach(function (tag) {
@@ -46,7 +51,7 @@ document.addEventListener('readystatechange', function (event) {
           }
         }
         catch (e) {
-          console.log('exception', JSON.stringify(e, Object.keys(e), 2), e.toString());
+          DEBUG_ADDON && console.log('exception', JSON.stringify(e, Object.keys(e), 2), e.toString());
         }
         break;
       }
@@ -55,9 +60,6 @@ document.addEventListener('readystatechange', function (event) {
         
       }
     });
-    // self is undefined when using require in jpm test.
-    // (typeof self !== 'undefined') && self.port.emit('request_editMdn');
-    // })();
     browser.runtime.sendMessage({
       type: 'request_editMdn'
     });

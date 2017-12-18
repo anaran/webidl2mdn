@@ -21,20 +21,19 @@
       options.button.setAttribute('data-path', options.path);
 
       browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
-                  switch (message.type) {
+        switch (message.type) {
 
-                  case 'request_editMdn': {
+        case 'request_editMdn': {
+          browser.runtime.sendMessage({
+            type: 'load_editMdn',
+            source: options.source.textContent,
+            tags: options.tags,
+          });
+          break;
+        }
 
-                    browser.runtime.sendMessage({
-                      type: 'load_editMdn',
-                      source: options.source.textContent,
-                      tags: options.tags,
-                    });
-                    break;
-                  }
-
-                  }
-                });
+        }
+      });
 
       options.button.addEventListener('click', function (event) {
         // event.preventDefault();
@@ -288,6 +287,19 @@
         });
         let subTreeSelect = document.body.querySelector('#url_sub_tree_select');
         let subTreeInput = document.body.querySelector('#url_sub_tree');
+        // let loginName = document.querySelector('span.login-name');
+
+        browser.runtime.sendMessage({
+          type: 'request_mdn_user_name'
+        }).then(res => {
+          DEBUG_ADDON && console.log('res', res);
+          if (res.mdn_user_name) {
+            subTreeSelect.options[1].value = `en-US/docs/User:${res.mdn_user_name}/webidl_mdn/`;
+          }
+          else {
+            window.alert('Please login to MDN to create/add to documents');
+          }
+        });
         subTreeSelect.addEventListener('change', function (event) {
           subTreeInput.value = event.target.value;
         });
@@ -507,7 +519,6 @@
         overviewSource.textContent = overviewContent.innerHTML;
       }
       catch (e) {
-        // console.exception(e);
         console.log('exception', JSON.stringify(e, Object.keys(e), 2), e.toString());
       }
       break;
@@ -517,11 +528,4 @@
       
     }
   });
-  // browser.runtime.sendMessage({
-  //   type: 'request_webidl2mdn'
-  // }).then(res => {
-  //   console.log(res);
-  // }).catch(err => {
-  //   console.log(err);
-  // });
 })();
