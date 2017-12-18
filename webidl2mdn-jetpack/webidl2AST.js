@@ -4,6 +4,7 @@ console.log(window.location, window.document.readyState);
 //   sendResponse({message: message, sender: sender});
 // });
 const WebIDL2 = window.WebIDL2;
+let DEBUG_ADDON = true;
  
 browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
   switch (message.type) {
@@ -39,6 +40,30 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
           console.log('executeScript error', err);
         });
     });
+    break;
+  }
+
+  case 'request_mdn_user_name': {
+    browser.tabs.create({
+      // Causes alert from github for unusual number of authorization requests
+      // url: 'https://developer.mozilla.org/users/github/login/'
+      url: 'https://developer.mozilla.org/'
+    }).then(tab => {
+      browser.tabs.executeScript(
+        tab.id,
+        {
+          code: 'document.querySelector("span.login-name") && document.querySelector("span.login-name").textContent;'
+        }
+      ).then(res => {
+        DEBUG_ADDON && console.log('res[0]', res[0]);
+        sendResponse({ 'mdn_user_name': res[0] });
+      }).catch(err => {
+        console.log('browser.tabs.executeScript error', err);
+      });
+    }).catch(err => {
+      console.log('browser.tabs.create error', err);
+    });
+    return true;
     break;
   }
 
