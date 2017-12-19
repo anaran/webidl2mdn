@@ -57,6 +57,7 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
       ).then(res => {
         DEBUG_ADDON && console.log('res[0]', res[0]);
         sendResponse({ 'mdn_user_name': res[0] });
+        browser.tabs.remove(tab.id);
       }).catch(err => {
         console.log('browser.tabs.executeScript error', err);
       });
