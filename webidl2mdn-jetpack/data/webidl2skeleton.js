@@ -474,7 +474,8 @@
                   element.parentElement.replaceChild(document.createTextNode(value.name + '.' + member.name), element)
                 });
                 if (member.readonly) {
-                  propertyUI.firstElementChild.textContent += '{{readonlyInline}}';
+                  // Fixes #3
+                  propertyUI.firstElementChild.textContent += ' {{ReadOnlyInline}}';
                 }
                 if (member.extAttrs.some(function (attr) {
                   if (attr.name == 'CheckAnyPermissions' &&
