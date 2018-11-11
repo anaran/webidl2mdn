@@ -88,13 +88,14 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
           console.log('executeScript leads', res, this);
           const manifest = browser.runtime.getManifest();
           browser.tabs.sendMessage(tab.id, {
-            type: 'load_AST',
+            AST: AST,
+            api_name: message.api_name,
             generator: manifest.name,
+            homepage: manifest.developer.url,
             icon: browser.extension.getURL(manifest.icons["48"]),
             title: manifest.name,
+            type: 'load_AST',
             url: message.url,
-            api_name: message.api_name,
-            AST: AST
           }).then(res => {
             console.log(res);
           }).catch(err => {

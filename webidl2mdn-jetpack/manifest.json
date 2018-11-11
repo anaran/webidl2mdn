@@ -22,7 +22,7 @@
       ],
       "include_globs": [
         "*.webidl",
-        "https://gist.github.com/*",
+        "https://gist.github.com/*"
       ],
       "js": [
         "index.js"
