@@ -93,6 +93,7 @@ browser.runtime.onMessage.addListener((message, sender, sendResponse) => {
             icon: browser.extension.getURL(manifest.icons["48"]),
             title: manifest.name,
             url: message.url,
+            api_name: message.api_name,
             AST: AST
           }).then(res => {
             console.log(res);

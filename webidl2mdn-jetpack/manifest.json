@@ -21,7 +21,8 @@
         "<all_urls>"
       ],
       "include_globs": [
-        "*.webidl"
+        "*.webidl",
+        "https://gist.github.com/*",
       ],
       "js": [
         "index.js"
@@ -51,7 +52,7 @@
     "tabs"
   ],
 
-  "version": "1.0.1",
+  "version": "1.0.2alpha1",
 
   "web_accessible_resources": [
     "data/posts-48.png"

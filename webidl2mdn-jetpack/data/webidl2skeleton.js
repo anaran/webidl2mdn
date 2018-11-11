@@ -210,7 +210,7 @@
       try {
         DEBUG_ADDON && console.log('load_AST', message);
         let path = message.url.split('/');
-        let nameOfApi = message.url.match(/([^\/]+)\.webidl\b/)[1];
+        let nameOfApi = message.api_name;
         document.getElementById('favicon').href = message.icon;
         let applicationDescription = document.getElementById('application_description');
         let applicationDescriptionToggle = document.getElementById('application_description_toggle');
